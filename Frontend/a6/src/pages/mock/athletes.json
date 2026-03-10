@@ -1,0 +1,4 @@
+[
+  { "id": "a-1", "firstName": "Mara", "lastName": "H.", "birthDate": "2001-03-05", "weightKg": 60, "heightCm": 170, "level": "advanced", "sports": ["running","cycling"] },
+  { "id": "a-2", "firstName": "Leo", "lastName": "K.", "birthDate": "1999-10-21", "weightKg": 74, "heightCm": 180, "level": "intermediate", "sports": ["running"] }
+]
