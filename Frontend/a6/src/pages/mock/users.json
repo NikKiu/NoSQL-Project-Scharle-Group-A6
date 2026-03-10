@@ -1,0 +1,5 @@
+[
+  { "id": "u-admin", "email": "admin@example.com", "role": "admin" },
+  { "id": "u-trainer", "email": "trainer@example.com", "role": "trainer", "trainersportlerIds": ["a-1", "a-2"] },
+  { "id": "u-athlete", "email": "athlete@example.com", "role": "athlete", "sportlerId": "a-1" }
+]

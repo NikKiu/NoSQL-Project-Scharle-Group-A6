@@ -1,0 +1,62 @@
+
+.header {
+    width: 100%;
+    top: 0; left: 0; right: 0;
+    height: 64px;
+    background-color: #0C2340;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    font-family: system-ui, sans-serif;
+}
+
+.name .logo {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.role {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #cbd5e1;
+    margin-left: 16px;
+}
+
+.role a {
+    color: #545AA7;
+    cursor: pointer;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.line {
+    width: 1px;
+    height: 20px;
+    background-color: gray;
+}
+
+.email {
+    color: gray;
+}
+
+.log-button {
+    background-color: #545AA7;
+    border: none;
+    padding: 8px 18px;
+    margin-right: 18px;
+    border-radius: 12px;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #0f0f0f;
+}
+
+.log-button:hover {
+    background-color: gray;
+}
+
+

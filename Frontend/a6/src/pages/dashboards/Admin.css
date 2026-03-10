@@ -1,0 +1,10 @@
+
+.content{
+    margin-left : 16px;
+}
+.table{
+    background-color: #0C2340;
+}
+th, td {
+    padding: 10px;
+}
