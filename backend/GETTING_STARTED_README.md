@@ -1,45 +1,72 @@
-# Backend Getting Started
+﻿# Backend Getting Started
 
-Diese Anleitung zeigt dir genau, **in welchem Ordner** du welche Befehle ausführen musst.
+Diese Anleitung zeigt dir genau, in welchem Ordner du welche Befehle ausfuehren musst.
+
+## Voraussetzungen
+
+- Node.js 20+ (LTS empfohlen)
+- Docker Desktop (fuer lokale MongoDB via `docker compose`)
+
+Wichtig zu NestJS:
+- Ein globales NestJS CLI (`npm i -g @nestjs/cli`) ist **nicht** erforderlich.
+- Das Projekt bringt `@nestjs/cli` bereits lokal in `backend/sportapi` mit.
+
+Windows-Hinweis:
+- Wenn PowerShell `npm` blockiert (Execution Policy), nutze `npm.cmd` statt `npm`.
 
 ## Projektstruktur
 
-- `backend/database`  
-  Enthält `docker-compose.yml` für MongoDB.
-- `backend/sportapi`  
-  NestJS-Backend (API).
+- `backend/database`
+  - enthaelt `docker-compose.yml` fuer MongoDB
+- `backend/sportapi`
+  - NestJS Backend API
 
-## Pakete installieren (in `backend`):
+## 1) Dependencies installieren
+
+Im Ordner `backend`:
 
 ```bash
 npm install
 ```
-## 1) MongoDB mit Docker starten
 
-In den Ordner `backend/database` wechseln und dort ausführen:
+Im Ordner `backend/sportapi`:
+
+```bash
+npm install
+```
+
+## 2) MongoDB mit Docker starten
+
+Im Ordner `backend/database`:
 
 ```bash
 docker compose up -d
 ```
 
-Status prüfen (ebenfalls in `backend/database`):
+Status pruefen:
 
 ```bash
-docker compose -f ps
+docker compose ps
 ```
 
-MongoDB stoppen (in `backend/database`):
+MongoDB stoppen:
 
 ```bash
-docker compose -f down
+docker compose down
 ```
 
-## 2) API starten
+## 3) API starten
 
-In den Ordner `backend/sportapi` wechseln und dort ausführen:
+Im Ordner `backend/sportapi`:
 
 ```bash
 npm run start:dev
+```
+
+Wenn `npm` in PowerShell gesperrt ist:
+
+```bash
+npm.cmd run start:dev
 ```
 
 API erreichbar unter:
@@ -47,12 +74,25 @@ API erreichbar unter:
 - `http://localhost:3000/api`
 - Healthcheck: `GET http://localhost:3000/api/health`
 
-## 3) Seed-Daten laden (optional, empfohlen)
+### Auth-Header fuer alle fachlichen Endpunkte
 
-Im Ordner `backend/sportapi` ausführen:
+Alle Endpunkte (ausser Health) erwarten:
+
+- `x-user-id`
+- `x-role` (`admin`, `trainer`, `athlete`)
+
+## 4) Seed-Daten laden (optional)
+
+Im Ordner `backend/sportapi`:
 
 ```bash
 npm run seed
+```
+
+Wenn `npm` in PowerShell gesperrt ist:
+
+```bash
+npm.cmd run seed
 ```
 
 Danach kannst du mit diesen Headern testen:
@@ -61,9 +101,42 @@ Danach kannst du mit diesen Headern testen:
 - Trainer: `x-user-id: trainer-1`, `x-role: trainer`
 - Athlete: `x-user-id: athlete-user-1`, `x-role: athlete`
 
-## 4) Compass verbinden (optional)
+## 5) MongoDB Compass (optional)
 
-In MongoDB Compass verbinden mit:
+Verbindungsstring:
 
 - `mongodb://localhost:27017`
-- Datenbankname: `sport_performance`
+
+Datenbankname:
+
+- `sport_performance`
+
+## API Uebersicht
+
+### Athletes
+
+- `POST /api/athletes` (Profil anlegen)
+- `GET /api/athletes` (Profile listen)
+- `GET /api/athletes/:athleteId` (Profil abrufen)
+- `PATCH /api/athletes/:athleteId` (Profil aktualisieren)
+- `DELETE /api/athletes/:athleteId` (Profil loeschen)
+
+### Sessions
+
+- `POST /api/sessions` (Trainingseinheit anlegen)
+- `GET /api/sessions/:sessionId` (Trainingseinheit abrufen)
+- `GET /api/athletes/:athleteId/sessions` (Trainingshistorie / Sessions)
+- `PATCH /api/sessions/:sessionId/finish` (Trainingseinheit abschliessen)
+
+### Sensor Events
+
+- `POST /api/sensor-events` (ein Sensordatenpunkt)
+- `POST /api/sensor-events/batch` (Bulk-Ingest fuer hohe Schreiblast)
+- `GET /api/athletes/:athleteId/sensor-events/recent?seconds=600`
+
+### Analytics
+
+- `GET /api/analytics/athletes/:athleteId/average-heart-rate?from=...&to=...`
+- `GET /api/analytics/sessions/:sessionId/summary`
+- `GET /api/analytics/athletes/:athleteId/history?from=...&to=...`
+- `POST /api/analytics/athletes/:athleteId/load-zones/calculate`
