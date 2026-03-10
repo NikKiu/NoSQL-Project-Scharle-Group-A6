@@ -30,6 +30,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route
                         path="/dashboard/trainer"
                         element={
+
                             <ProtectedRoute allow={["trainer"]}>
                                 <TrainerDashboard />
                             </ProtectedRoute>
