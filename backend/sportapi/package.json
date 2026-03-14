@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nest start",
-    "start:dev": "nest start --watch",
+    "start:dev": "npm run seed && nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "seed": "ts-node src/seed.ts",
@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.16",
+    "@types/node": "^25.4.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
