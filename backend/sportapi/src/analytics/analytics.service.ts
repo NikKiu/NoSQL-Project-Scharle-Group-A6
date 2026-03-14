@@ -359,7 +359,7 @@ export class AnalyticsService {
    * F10: Leaderboard für eine Sportart
    * US 19: Vergleiche zwischen Sportlern durchführen
    */
-  async getLeaderboard(query: any) {
+  async getLeaderboard(query: any, user: RequestUser) {
     const sport = query.sport || 'running';
     const metric = query.metric || 'speed';
     const limit = Number(query.limit) || 10;
@@ -385,7 +385,7 @@ export class AnalyticsService {
    * F10: Training-Level-Vergleich
    * US 19: Vergleiche zwischen Sportlern durchführen
    */
-  async compareByTrainingLevel(query: any) {
+  async compareByTrainingLevel(query: any, user: RequestUser) {
     const sport = query.sport || 'running';
     const from = query.from ? parseDate(query.from, 'from') : undefined;
     const to = query.to ? parseDate(query.to, 'to') : undefined;
