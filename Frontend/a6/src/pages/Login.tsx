@@ -4,28 +4,56 @@ import type { Role } from "../types.ts";
 import { useAuth } from "../auth.tsx";
 import { useLocation, useNavigate } from "react-router-dom";
 import Run from '../assets/runner.jpg';
-import {NavLink} from "react-router";
+import { NavLink } from "react-router-dom";
+import { createApiClient } from "../services/API-functions";
 
 
 const roleToPath: Record<Role, string> = {
     admin: "/dashboard/admin",
     trainer: "/dashboard/trainer",
-    sportler: "/dashboard/sportler",
+    athlete: "/dashboard/sportler",
 };
 
 export default function Login() {
-    const [email, setName] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [role, setRole] = useState<Role>("sportler");
+    const [role, setRole] = useState<Role>("athlete");
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
     const { login } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
     const from = (location.state as any)?.from?.pathname as string | undefined;
+    const api = createApiClient();
 
-    function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        login({ email, role });
-        navigate(from ?? roleToPath[role], { replace: true });
+        setError(null);
+        setLoading(true);
+        try {
+            const result = await api.login({ email, password });
+            if (result.auth.role !== role) {
+                throw new Error("Die ausgewählte Rolle passt nicht zu diesem Konto.");
+            }
+
+            login({
+                user: {
+                    id: result.user.userId,
+                    userId: result.user.userId,
+                    email: result.user.email,
+                    role: result.user.role,
+                    athleteId: result.user.athleteId ?? null,
+                    trainerAthleteIds: result.user.trainerAthleteIds ?? [],
+                    name: result.user.name ?? undefined
+                },
+                apiAuth: result.auth
+            });
+            navigate(from ?? roleToPath[result.auth.role], { replace: true });
+        } catch (err: any) {
+            setError(err?.message || "Login fehlgeschlagen");
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
@@ -39,8 +67,8 @@ export default function Login() {
                     <h2>E-Mail</h2>
                     <input
                         value={email}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Name"
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="E-Mail"
                         required
                     />
                 </label>
@@ -49,6 +77,7 @@ export default function Login() {
                 <label>
                     <h2>Passwort</h2>
                     <input
+                        type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Passwort"
@@ -66,11 +95,13 @@ export default function Login() {
                     >
                         <option value="trainer">Trainer</option>
                         <option value="admin">Admin</option>
-                        <option value="sportler">Sportler</option>
+                        <option value="athlete">Sportler</option>
                     </select>
                 </label>
 
-                <button type="submit" >
+                {error ? <p className="error-text">{error}</p> : null}
+
+                <button type="submit" disabled={loading}>
                     Anmelden
                 </button>
                 <ul >

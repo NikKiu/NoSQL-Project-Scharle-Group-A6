@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, Req } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { getRequestUser } from '../common/auth/auth.utils';
 
@@ -70,6 +70,31 @@ export class AdminController {
   @Get('users')
   getUsers(@Query() query: any, @Req() req: any) {
     return this.adminService.getUsers(query, getRequestUser(req));
+  }
+
+  @Get('sensor-catalog')
+  getSensorCatalog(@Req() req: any) {
+    return this.adminService.getSensorCatalog(getRequestUser(req));
+  }
+
+  @Get('trainer-assignments')
+  getTrainerAssignments(@Req() req: any) {
+    return this.adminService.getTrainerAssignments(getRequestUser(req));
+  }
+
+  @Post('users')
+  createUser(@Body() body: any, @Req() req: any) {
+    return this.adminService.createUser(body, getRequestUser(req));
+  }
+
+  @Post('sensor-types')
+  upsertSensorType(@Body() body: any, @Req() req: any) {
+    return this.adminService.upsertSensorType(body, getRequestUser(req));
+  }
+
+  @Patch('trainers/:trainerId/athletes')
+  updateTrainerAssignment(@Param('trainerId') trainerId: string, @Body() body: any, @Req() req: any) {
+    return this.adminService.updateTrainerAthleteAssignment(trainerId, body, getRequestUser(req));
   }
 }
 

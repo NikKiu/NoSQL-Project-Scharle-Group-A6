@@ -3,7 +3,8 @@ import { RequestUser, USER_ROLES } from './auth.types';
 
 export function getRequestUser(req: any): RequestUser {
   const userId = (req.headers?.['x-user-id'] || '').toString().trim();
-  const role = (req.headers?.['x-role'] || '').toString().trim();
+  const rawRole = (req.headers?.['x-role'] || '').toString().trim();
+  const role = rawRole === 'sportler' ? 'athlete' : rawRole;
   const allowHeaderlessTestAccess = process.env.ALLOW_HEADERLESS_TEST_ACCESS !== 'false';
 
   if (!userId || !role) {

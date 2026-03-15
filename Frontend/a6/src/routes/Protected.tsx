@@ -11,7 +11,7 @@ type ProtectedRouteProps = {
 const roleToPath: Record<Role, string> = {
     admin: "/dashboard/admin",
     trainer: "/dashboard/trainer",
-    sportler: "/dashboard/sportler",
+    athlete: "/dashboard/sportler",
 };
 
 export default function ProtectedRoute({ children, allow }: ProtectedRouteProps) {

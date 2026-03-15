@@ -25,4 +25,9 @@ export class SessionsController {
   finish(@Param('sessionId') sessionId: string, @Body() body: any, @Req() req: any) {
     return this.sessionsService.finish(sessionId, body, getRequestUser(req));
   }
+
+  @Patch('sessions/:sessionId/notes')
+  updateNotes(@Param('sessionId') sessionId: string, @Body() body: any, @Req() req: any) {
+    return this.sessionsService.updateNotes(sessionId, body, getRequestUser(req));
+  }
 }

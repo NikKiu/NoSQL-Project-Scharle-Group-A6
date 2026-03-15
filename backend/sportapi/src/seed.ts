@@ -1,4 +1,5 @@
 ﻿import { MongoService } from './mongo.service';
+import { createHash } from 'crypto';
 
 async function seed() {
   const mongoService = new MongoService();
@@ -8,14 +9,20 @@ async function seed() {
   console.log('🌱 Starting comprehensive seed...');
 
   const now = new Date();
+  const hashPassword = (password: string) =>
+    createHash('sha256').update(`${process.env.AUTH_PASSWORD_PEPPER || 'dev-pepper'}:${password}`).digest('hex');
 
   // ==================== USERS ====================
   const users = [
     {
       id: 'admin-1',
       userId: 'admin-1',
+      email: 'admin@sport.local',
       role: 'admin',
       name: 'System Admin',
+      passwordHash: hashPassword('admin123'),
+      trainerAthleteIds: [],
+      athleteId: null,
       firstName: 'System',
       lastName: 'Admin',
       createdAt: now,
@@ -24,8 +31,12 @@ async function seed() {
     {
       id: 'trainer-1',
       userId: 'trainer-1',
+      email: 'trainer@sport.local',
       role: 'trainer',
       name: 'Timo Trainer',
+      passwordHash: hashPassword('trainer123'),
+      trainerAthleteIds: ['athlete-1', 'athlete-2', 'athlete-3', 'athlete-4', 'athlete-5'],
+      athleteId: null,
       firstName: 'Timo',
       lastName: 'Trainer',
       createdAt: now,
@@ -34,8 +45,12 @@ async function seed() {
     {
       id: 'athlete-user-1',
       userId: 'athlete-user-1',
+      email: 'alex@sport.local',
       role: 'athlete',
       name: 'Alex Meyer',
+      passwordHash: hashPassword('athlete123'),
+      trainerAthleteIds: [],
+      athleteId: 'athlete-1',
       firstName: 'Alex',
       lastName: 'Meyer',
       createdAt: now,
@@ -44,8 +59,12 @@ async function seed() {
     {
       id: 'athlete-user-2',
       userId: 'athlete-user-2',
+      email: 'sarah@sport.local',
       role: 'athlete',
       name: 'Sarah Schmidt',
+      passwordHash: hashPassword('athlete123'),
+      trainerAthleteIds: [],
+      athleteId: 'athlete-2',
       firstName: 'Sarah',
       lastName: 'Schmidt',
       createdAt: now,
@@ -54,8 +73,12 @@ async function seed() {
     {
       id: 'athlete-user-3',
       userId: 'athlete-user-3',
+      email: 'max@sport.local',
       role: 'athlete',
       name: 'Max Müller',
+      passwordHash: hashPassword('athlete123'),
+      trainerAthleteIds: [],
+      athleteId: 'athlete-3',
       firstName: 'Max',
       lastName: 'Müller',
       createdAt: now,
@@ -64,8 +87,12 @@ async function seed() {
     {
       id: 'athlete-user-4',
       userId: 'athlete-user-4',
+      email: 'lisa@sport.local',
       role: 'athlete',
       name: 'Lisa Wagner',
+      passwordHash: hashPassword('athlete123'),
+      trainerAthleteIds: [],
+      athleteId: 'athlete-4',
       firstName: 'Lisa',
       lastName: 'Wagner',
       createdAt: now,
@@ -74,8 +101,12 @@ async function seed() {
     {
       id: 'athlete-user-5',
       userId: 'athlete-user-5',
+      email: 'tom@sport.local',
       role: 'athlete',
       name: 'Tom Fischer',
+      passwordHash: hashPassword('athlete123'),
+      trainerAthleteIds: [],
+      athleteId: 'athlete-5',
       firstName: 'Tom',
       lastName: 'Fischer',
       createdAt: now,
@@ -150,7 +181,7 @@ async function seed() {
       gender: 'male',
       weightKg: 82,
       heightCm: 186,
-      trainingLevel: 'anfaenger',
+      trainingLevel: 'anfänger',
       sports: ['cycling', 'swimming'],
       loadZones: {
         z1: { min: 93, max: 112 },
@@ -404,6 +435,35 @@ async function seed() {
 
   await db.collection('audit_logs').insertMany(auditLogs);
 
+  // ==================== SENSOR TYPES ====================
+  await db.collection('sensor_types').deleteMany({});
+  await db.collection('sensor_types').insertMany([
+    {
+      sensorType: 'heart-rate',
+      displayName: 'Herzfrequenz',
+      unit: 'bpm',
+      description: 'Puls pro Minute',
+      createdAt: now,
+      updatedAt: now
+    },
+    {
+      sensorType: 'gps',
+      displayName: 'GPS',
+      unit: 'coordinates',
+      description: 'Positions- und Geschwindigkeitsdaten',
+      createdAt: now,
+      updatedAt: now
+    },
+    {
+      sensorType: 'power',
+      displayName: 'Leistung',
+      unit: 'W',
+      description: 'Leistungswerte in Watt',
+      createdAt: now,
+      updatedAt: now
+    }
+  ]);
+
   // ==================== SUMMARY ====================
   console.log('\n✅ Seed completed successfully!\n');
   console.log('📊 Data Summary:');
@@ -412,9 +472,21 @@ async function seed() {
   console.log(`   - Training Sessions: ${sessions.length}`);
   console.log(`   - Sensor Events: ${eventCount}`);
   console.log(`   - Audit Logs: ${auditLogs.length}`);
+  console.log('   - Sensor Types: 3');
   console.log('');
 
   console.log('👤 Test User Credentials (use these headers in Postman/curl):');
+  console.log('   Login credentials:');
+  console.log('      admin@sport.local / admin123');
+  console.log('      trainer@sport.local / trainer123');
+  console.log('      alex@sport.local / athlete123');
+  console.log('      sarah@sport.local / athlete123');
+  console.log('      max@sport.local / athlete123');
+  console.log('      lisa@sport.local / athlete123');
+  console.log('      tom@sport.local / athlete123');
+  console.log('');
+
+  console.log('Header auth (legacy mode):');
   console.log('   Admin:');
   console.log('      x-user-id: admin-1');
   console.log('      x-role: admin');

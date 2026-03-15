@@ -22,14 +22,14 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    color: #cbd5e1;
+    color: #e2e8f0;
     margin-left: 16px;
 }
 
 .role a {
-    color: #545AA7;
+    color: #9fb6ff;
     cursor: pointer;
-    font-weight: 500;
+    font-weight: 700;
     text-decoration: none;
 }
 
@@ -40,23 +40,23 @@
 }
 
 .email {
-    color: gray;
+    color: #cbd5e1;
 }
 
 .log-button {
-    background-color: #545AA7;
-    border: none;
+    background-color: #9fb6ff;
+    border: 1px solid #bcd0ff;
     padding: 8px 18px;
     margin-right: 18px;
     border-radius: 12px;
     font-size: 15px;
     cursor: pointer;
     font-weight: 600;
-    color: #0f0f0f;
+    color: #0C2340;
 }
 
 .log-button:hover {
-    background-color: gray;
+    background-color: #c6d6ff;
 }
 
 

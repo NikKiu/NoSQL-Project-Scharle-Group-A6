@@ -14,13 +14,13 @@ export async function getSportler(id: string): Promise<Sportler | undefined> {
 export async function getSportlersByIds(ids: string[]): Promise<Sportler[]> {
   const res = await fetch('/mock/athletes.json')
   const arr: Sportler[] = await res.json()
-  return arr.filter(a => ids.includes(a.id))
+  return arr.filter((a) => (a.id ? ids.includes(a.id) : false))
 }
 
 export async function getTrainingsBySportler(sportlerId: string): Promise<Training[]> {
   const res = await fetch('/mock/trainings.json')
   const arr: Training[] = await res.json()
-  return arr.filter(t => t.sportlerId === sportlerId).sort((a,b)=> (b.startTs.localeCompare(a.startTs)))
+  return arr.filter(t => t.athleteId === sportlerId).sort((a,b)=> (b.startTs.localeCompare(a.startTs)))
 }
 
 export async function getTimeSeries(sportlerId: string, trainingId: string): Promise<TimeSeries> {

@@ -1,14 +1,57 @@
 import { useAuth } from "../../auth";
 import { useEffect, useState } from "react";
-import "./trainer.css";
+import "./Trainer.css";
 import Header from "../components/Header.tsx";
+import { createApiClient } from "../../services/API-functions";
 
-type AthleteCard = { id: string; name: string; avgHr7d: number; minutes7d: number; lastSession?: string };
+type AthleteCard = { athleteId: string; firstName: string; lastName: string; trainingLevel: string };
+type SessionDto = { sessionId: string; sport: string; status: string; startAt: string; endAt?: string };
 
 export default function TrainerDashboard() {
-    const  { user, logout } = useAuth();
+    const  { user, apiAuth, logout } = useAuth();
     const [athletes, setAthletes] = useState<AthleteCard[]>([]);
-    useEffect(() => { fetch("/api/trainer/athletes").then(r => r.json()).then(setAthletes); }, []);
+    const [selectedAthleteId, setSelectedAthleteId] = useState<string>("");
+    const [sessions, setSessions] = useState<SessionDto[]>([]);
+    const [compareIds, setCompareIds] = useState<string[]>([]);
+    const [compareResult, setCompareResult] = useState<any>(null);
+    const [error, setError] = useState<string | null>(null);
+    const api = createApiClient({ auth: apiAuth ?? undefined });
+
+    useEffect(() => {
+        api.listAthletes<AthleteCard[]>()
+            .then((list) => {
+                setAthletes(list);
+                if (list.length > 0) setSelectedAthleteId(list[0].athleteId);
+            })
+            .catch((err: any) => setError(err?.message || "Athleten konnten nicht geladen werden"));
+    }, [apiAuth?.userId]);
+
+    useEffect(() => {
+        if (!selectedAthleteId) return;
+        api.listSessionsForAthlete<SessionDto[]>(selectedAthleteId, { limit: 20 })
+            .then(setSessions)
+            .catch((err: any) => setError(err?.message || "Sessions konnten nicht geladen werden"));
+    }, [selectedAthleteId, apiAuth?.userId]);
+
+    const toggleCompare = (athleteId: string) => {
+        setCompareIds((prev) =>
+            prev.includes(athleteId) ? prev.filter((id) => id !== athleteId) : [...prev, athleteId].slice(-3)
+        );
+    };
+
+    const runComparison = async () => {
+        if (compareIds.length < 2) {
+            setError("Bitte mindestens zwei Sportler für den Vergleich wählen.");
+            return;
+        }
+        try {
+            setError(null);
+            const result = await api.compareAthletes({ athleteIds: compareIds, sport: "running" });
+            setCompareResult(result);
+        } catch (err: any) {
+            setError(err?.message || "Vergleich fehlgeschlagen");
+        }
+    };
 
     return (
         <div className="page">
@@ -21,19 +64,58 @@ export default function TrainerDashboard() {
 
             <section className="grid">
                 {athletes.map(a => (
-                    <div key={a.id} className="athlete-card">
-                        <div className="name">{a.name}</div>
+                    <div key={a.athleteId} className="athlete-card">
+                        <div className="name">{a.firstName} {a.lastName}</div>
                         <div className="mini-kpis">
-                            <span>Ø Puls 7d: {a.avgHr7d} bpm</span>
-                            <span>Minuten 7d: {a.minutes7d}</span>
-                            <span>Letzte Einheit: {a.lastSession ?? "-"}</span>
+                            <span>ID: {a.athleteId}</span>
+                            <span>Level: {a.trainingLevel}</span>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={compareIds.includes(a.athleteId)}
+                                    onChange={() => toggleCompare(a.athleteId)}
+                                /> Vergleichen
+                            </label>
                         </div>
-                        <button onClick={() => location.assign(`/dashboard/trainer/${a.id}`)}>Details</button>
+                        <button onClick={() => setSelectedAthleteId(a.athleteId)}>Sessions anzeigen</button>
                     </div>
                 ))}
             </section>
 
-            <button onClick={logout}>Logout</button>
+            <section className="trainer-panels">
+                <div className="panel">
+                    <h2>Session-Historie</h2>
+                    <p>Ausgewählter Sportler: {selectedAthleteId || "-"}</p>
+                    <table className="table">
+                        <thead>
+                        <tr><th>Session</th><th>Sport</th><th>Status</th><th>Start</th></tr>
+                        </thead>
+                        <tbody>
+                        {sessions.map((s) => (
+                            <tr key={s.sessionId}>
+                                <td>{s.sessionId}</td>
+                                <td>{s.sport}</td>
+                                <td>{s.status}</td>
+                                <td>{new Date(s.startAt).toLocaleString()}</td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div className="panel">
+                    <h2>Sportlervergleich</h2>
+                    <button onClick={runComparison}>Vergleich starten</button>
+                    {compareResult ? (
+                        <pre className="compare-box">{JSON.stringify(compareResult, null, 2)}</pre>
+                    ) : (
+                        <p>Wähle 2-3 Sportler und starte den Vergleich.</p>
+                    )}
+                </div>
+            </section>
+
+            {error ? <p className="error-text">{error}</p> : null}
+
         </div>
     );
 }
