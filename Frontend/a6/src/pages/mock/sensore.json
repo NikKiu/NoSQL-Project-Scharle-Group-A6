@@ -1,7 +1,0 @@
-[
-  { "id": "1", "name": "Forerunner55", "type": "Garmin Watch" , "details": "-"},
-  { "id": "2", "name": "Forerunner150", "type": "Garmin Watch" , "details": "-"},
-  { "id": "3", "name": "Galaxyring", "type": "Samsung Ring" , "details": "-"},
-  { "id": "4", "name": "Air 3rd G", "type": "Apple Watch" , "details": "-"},
-  { "id": "5", "name": "RunBro", "type": "WaistBand" , "details": "-"}
-]
