@@ -16,6 +16,11 @@ export class SensorEventsController {
     return this.sensorEventsService.createBatch(body, getRequestUser(req));
   }
 
+  @Post('sensor-events/simulate')
+  simulateAndCreate(@Body() body: any, @Req() req: any) {
+    return this.sensorEventsService.simulateAndCreate(body, getRequestUser(req));
+  }
+
   @Get('athletes/:athleteId/sensor-events/recent')
   recentForAthlete(@Param('athleteId') athleteId: string, @Req() req: any, @Query() query: any) {
     return this.sensorEventsService.recentForAthlete(athleteId, getRequestUser(req), query);

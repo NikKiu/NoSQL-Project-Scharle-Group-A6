@@ -8,5 +8,8 @@
   heartRate?: number;
   speed?: number;
   distanceDelta?: number;
+  lat?: number;
+  lon?: number;
+  powerW?: number;
   createdAt: Date;
 }

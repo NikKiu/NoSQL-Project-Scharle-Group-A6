@@ -1,21 +1,28 @@
 ﻿import { MongoService } from './mongo.service';
+import { createHash } from 'crypto';
 
 async function seed() {
   const mongoService = new MongoService();
   await mongoService.onModuleInit();
   const db = mongoService.getDb();
 
-  console.log('🌱 Starting comprehensive seed...');
+  console.log('Starting comprehensive seed...');
 
   const now = new Date();
+  const hashPassword = (password: string) =>
+    createHash('sha256').update(`${process.env.AUTH_PASSWORD_PEPPER || 'dev-pepper'}:${password}`).digest('hex');
 
   // ==================== USERS ====================
   const users = [
     {
       id: 'admin-1',
       userId: 'admin-1',
+      email: 'admin@sport.local',
       role: 'admin',
       name: 'System Admin',
+      passwordHash: hashPassword('admin123'),
+      trainerAthleteIds: [],
+      athleteId: null,
       firstName: 'System',
       lastName: 'Admin',
       createdAt: now,
@@ -24,8 +31,12 @@ async function seed() {
     {
       id: 'trainer-1',
       userId: 'trainer-1',
+      email: 'trainer@sport.local',
       role: 'trainer',
       name: 'Timo Trainer',
+      passwordHash: hashPassword('trainer123'),
+      trainerAthleteIds: ['athlete-1', 'athlete-2', 'athlete-3', 'athlete-4', 'athlete-5'],
+      athleteId: null,
       firstName: 'Timo',
       lastName: 'Trainer',
       createdAt: now,
@@ -34,8 +45,12 @@ async function seed() {
     {
       id: 'athlete-user-1',
       userId: 'athlete-user-1',
+      email: 'alex@sport.local',
       role: 'athlete',
       name: 'Alex Meyer',
+      passwordHash: hashPassword('athlete123'),
+      trainerAthleteIds: [],
+      athleteId: 'athlete-1',
       firstName: 'Alex',
       lastName: 'Meyer',
       createdAt: now,
@@ -44,8 +59,12 @@ async function seed() {
     {
       id: 'athlete-user-2',
       userId: 'athlete-user-2',
+      email: 'sarah@sport.local',
       role: 'athlete',
       name: 'Sarah Schmidt',
+      passwordHash: hashPassword('athlete123'),
+      trainerAthleteIds: [],
+      athleteId: 'athlete-2',
       firstName: 'Sarah',
       lastName: 'Schmidt',
       createdAt: now,
@@ -54,8 +73,12 @@ async function seed() {
     {
       id: 'athlete-user-3',
       userId: 'athlete-user-3',
+      email: 'max@sport.local',
       role: 'athlete',
       name: 'Max Müller',
+      passwordHash: hashPassword('athlete123'),
+      trainerAthleteIds: [],
+      athleteId: 'athlete-3',
       firstName: 'Max',
       lastName: 'Müller',
       createdAt: now,
@@ -64,8 +87,12 @@ async function seed() {
     {
       id: 'athlete-user-4',
       userId: 'athlete-user-4',
+      email: 'lisa@sport.local',
       role: 'athlete',
       name: 'Lisa Wagner',
+      passwordHash: hashPassword('athlete123'),
+      trainerAthleteIds: [],
+      athleteId: 'athlete-4',
       firstName: 'Lisa',
       lastName: 'Wagner',
       createdAt: now,
@@ -74,8 +101,12 @@ async function seed() {
     {
       id: 'athlete-user-5',
       userId: 'athlete-user-5',
+      email: 'tom@sport.local',
       role: 'athlete',
       name: 'Tom Fischer',
+      passwordHash: hashPassword('athlete123'),
+      trainerAthleteIds: [],
+      athleteId: 'athlete-5',
       firstName: 'Tom',
       lastName: 'Fischer',
       createdAt: now,
@@ -83,7 +114,7 @@ async function seed() {
     }
   ];
 
-  console.log('📝 Creating users...');
+  console.log('Creating users...');
   await Promise.all(
     users.map((user) =>
       db.collection('users').updateOne(
@@ -150,7 +181,7 @@ async function seed() {
       gender: 'male',
       weightKg: 82,
       heightCm: 186,
-      trainingLevel: 'anfaenger',
+      trainingLevel: 'anfänger',
       sports: ['cycling', 'swimming'],
       loadZones: {
         z1: { min: 93, max: 112 },
@@ -208,7 +239,7 @@ async function seed() {
     }
   ];
 
-  console.log('🏃 Creating athletes...');
+  console.log('Creating athletes...');
   await Promise.all(
     athletes.map((athlete) =>
       db.collection('athletes').updateOne(
@@ -220,7 +251,7 @@ async function seed() {
   );
 
   // ==================== TRAINING SESSIONS ====================
-  console.log('📅 Creating training sessions...');
+  console.log('Creating training sessions...');
   const sessions = [];
   const allSensorEvents = [];
 
@@ -290,7 +321,7 @@ async function seed() {
   );
 
   // ==================== SENSOR EVENTS ====================
-  console.log('📊 Creating sensor events (this may take a while)...');
+  console.log('Creating sensor events (this may take a while)...');
 
   // Helper to generate realistic sensor data
   const generateSensorEvents = (session: any, baseHeartRate: number, baseSpeed: number) => {
@@ -298,6 +329,14 @@ async function seed() {
     const duration = session.endAt ? (session.endAt.getTime() - session.startAt.getTime()) / 1000 : 600;
     const eventInterval = 5; // 5 seconds between events
     const eventCount = Math.floor(duration / eventInterval);
+
+    const sensorTypes = Array.isArray(session.sensorTypes) && session.sensorTypes.length > 0
+      ? session.sensorTypes
+      : ['heart-rate', 'gps'];
+
+    let lat = 48.137154 + (Math.random() - 0.5) * 0.02;
+    let lon = 11.576124 + (Math.random() - 0.5) * 0.02;
+    let heading = Math.random() * Math.PI * 2;
 
     for (let i = 0; i < eventCount; i++) {
       const timestamp = new Date(session.startAt.getTime() + i * eventInterval * 1000);
@@ -323,18 +362,81 @@ async function seed() {
 
       const distanceDelta = speed * eventInterval / 3.6; // Convert km/h to meters per interval
 
-      events.push({
-        id: `${session.sessionId}-event-${i}`,
-        eventId: `${session.sessionId}-event-${i}`,
-        athleteId: session.athleteId,
-        sessionId: session.sessionId,
-        timestamp,
-        sensorType: ['heart-rate', 'gps', 'power'][i % 3],
-        metrics: { heartRate, speed, distanceDelta },
-        heartRate,
-        speed: parseFloat(speed.toFixed(2)),
-        distanceDelta: parseFloat(distanceDelta.toFixed(2)),
-        createdAt: timestamp
+      // Slight heading drift creates a natural route shape instead of straight lines.
+      heading += (Math.random() - 0.5) * 0.08;
+      const northMeters = Math.cos(heading) * distanceDelta;
+      const eastMeters = Math.sin(heading) * distanceDelta;
+      const metersPerDegLat = 111320;
+      const metersPerDegLon = Math.max(20000, 111320 * Math.cos((lat * Math.PI) / 180));
+      lat += northMeters / metersPerDegLat;
+      lon += eastMeters / metersPerDegLon;
+
+      const powerBase = session.sport === 'cycling' ? 230 : session.sport === 'running' ? 185 : 160;
+      const powerW = Math.max(
+        80,
+        Math.round(
+          powerBase +
+          warmup * 50 -
+          cooldown * 35 +
+          Math.sin(i / 12) * 18 +
+          (Math.random() - 0.5) * 14
+        )
+      );
+
+      sensorTypes.forEach((sensorType: string) => {
+        const eventId = `${session.sessionId}-event-${i}-${sensorType}`;
+
+        if (sensorType === 'heart-rate') {
+          events.push({
+            id: eventId,
+            eventId,
+            athleteId: session.athleteId,
+            sessionId: session.sessionId,
+            timestamp,
+            sensorType,
+            metrics: { heartRate },
+            heartRate,
+            createdAt: timestamp
+          });
+          return;
+        }
+
+        if (sensorType === 'gps') {
+          events.push({
+            id: eventId,
+            eventId,
+            athleteId: session.athleteId,
+            sessionId: session.sessionId,
+            timestamp,
+            sensorType,
+            metrics: {
+              speed: parseFloat(speed.toFixed(2)),
+              distanceDelta: parseFloat(distanceDelta.toFixed(2)),
+              lat: parseFloat(lat.toFixed(6)),
+              lon: parseFloat(lon.toFixed(6))
+            },
+            speed: parseFloat(speed.toFixed(2)),
+            distanceDelta: parseFloat(distanceDelta.toFixed(2)),
+            lat: parseFloat(lat.toFixed(6)),
+            lon: parseFloat(lon.toFixed(6)),
+            createdAt: timestamp
+          });
+          return;
+        }
+
+        if (sensorType === 'power') {
+          events.push({
+            id: eventId,
+            eventId,
+            athleteId: session.athleteId,
+            sessionId: session.sessionId,
+            timestamp,
+            sensorType,
+            metrics: { powerW },
+            powerW,
+            createdAt: timestamp
+          });
+        }
       });
     }
     return events;
@@ -365,10 +467,10 @@ async function seed() {
     eventCount += liveEvents.length;
   }
 
-  console.log(`📊 Inserting ${eventCount} sensor events...`);
+  console.log(`Inserting ${eventCount} sensor events...`);
   // Alte Events löschen, um Duplikate bei erneutem Seeding zu vermeiden
   await db.collection('sensor_events').deleteMany({});
-  console.log('  🗑️  Alte Sensor-Events gelöscht');
+  console.log('Alte Sensor-Events gelöscht');
 
   // In Batches einfügen
   const batchSize = 1000;
@@ -380,7 +482,7 @@ async function seed() {
   console.log('\n');
 
   // ==================== AUDIT LOGS ====================
-  console.log('📝 Creating audit logs...');
+  console.log('Creating audit logs...');
   await db.collection('audit_logs').deleteMany({});
   const auditLogs = [];
   const actions = ['CREATE_SESSION', 'UPDATE_ATHLETE', 'DELETE_SESSION', 'VIEW_DATA', 'EXPORT_DATA'];
@@ -404,17 +506,85 @@ async function seed() {
 
   await db.collection('audit_logs').insertMany(auditLogs);
 
+  // ==================== SENSOR TYPES ====================
+  await db.collection('sensor_types').deleteMany({});
+  await db.collection('sensor_types').insertMany([
+    {
+      sensorType: 'heart-rate',
+      displayName: 'Herzfrequenz',
+      unit: 'bpm',
+      description: 'Puls pro Minute',
+      generatorType: 'heart-rate',
+      generatorConfig: {
+        base: 145,
+        amplitude: 9,
+        noise: 6,
+        min: 80,
+        max: 205,
+        frequencyDivisor: 11
+      },
+      createdAt: now,
+      updatedAt: now
+    },
+    {
+      sensorType: 'gps',
+      displayName: 'GPS',
+      unit: 'coordinates',
+      description: 'Positions- und Geschwindigkeitsdaten',
+      generatorType: 'gps',
+      generatorConfig: {
+        base: 12,
+        amplitude: 2,
+        noise: 1,
+        min: 0.4,
+        max: 60,
+        frequencyDivisor: 13
+      },
+      createdAt: now,
+      updatedAt: now
+    },
+    {
+      sensorType: 'power',
+      displayName: 'Leistung',
+      unit: 'W',
+      description: 'Leistungswerte in Watt',
+      generatorType: 'power',
+      generatorConfig: {
+        base: 200,
+        amplitude: 25,
+        noise: 18,
+        min: 70,
+        max: 700,
+        frequencyDivisor: 10
+      },
+      createdAt: now,
+      updatedAt: now
+    }
+  ]);
+
   // ==================== SUMMARY ====================
   console.log('\n✅ Seed completed successfully!\n');
-  console.log('📊 Data Summary:');
+  console.log('Data Summary:');
   console.log(`   - Users: ${users.length}`);
   console.log(`   - Athletes: ${athletes.length}`);
   console.log(`   - Training Sessions: ${sessions.length}`);
   console.log(`   - Sensor Events: ${eventCount}`);
   console.log(`   - Audit Logs: ${auditLogs.length}`);
+  console.log('   - Sensor Types: 3');
   console.log('');
 
-  console.log('👤 Test User Credentials (use these headers in Postman/curl):');
+  console.log('Test User Credentials (use these headers in Postman/curl):');
+  console.log('   Login credentials:');
+  console.log('      admin@sport.local / admin123');
+  console.log('      trainer@sport.local / trainer123');
+  console.log('      alex@sport.local / athlete123');
+  console.log('      sarah@sport.local / athlete123');
+  console.log('      max@sport.local / athlete123');
+  console.log('      lisa@sport.local / athlete123');
+  console.log('      tom@sport.local / athlete123');
+  console.log('');
+
+  console.log('Header auth (legacy mode):');
   console.log('   Admin:');
   console.log('      x-user-id: admin-1');
   console.log('      x-role: admin');
@@ -430,7 +600,7 @@ async function seed() {
   console.log('      x-role: athlete');
   console.log('');
 
-  console.log('🧪 Test Scenarios:');
+  console.log('Test Scenarios:');
   console.log('');
   console.log('── EINFACHSTE ENDPUNKTE (kein Datum nötig) ──');
   console.log('');
@@ -506,10 +676,10 @@ async function seed() {
   console.log('');
 
   await mongoService.close();
-  console.log('🔒 Database connection closed.');
+  console.log('Database connection closed.');
 }
 
 seed().catch((error) => {
-  console.error('❌ Seed failed:', error);
+  console.error('Seed failed:', error);
   process.exit(1);
 });

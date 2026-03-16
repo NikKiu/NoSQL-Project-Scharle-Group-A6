@@ -5,6 +5,18 @@ export interface ApiAuth {
   role: BackendRole
 }
 
+export interface AuthResult {
+  auth: ApiAuth
+  user: {
+    userId: string
+    email: string
+    role: BackendRole
+    name?: string | null
+    athleteId?: string | null
+    trainerAthleteIds?: string[]
+  }
+}
+
 export interface ApiClientOptions {
   baseUrl?: string
   auth?: ApiAuth
@@ -63,6 +75,12 @@ async function request<T>(
 export function createApiClient(options: ApiClientOptions = {}) {
   const withDefaults = (opts?: ApiClientOptions) => ({ ...options, ...(opts ?? {}) })
   return {
+    register: <T = AuthResult>(body: unknown, opts?: ApiClientOptions) =>
+      register<T>(body, withDefaults(opts)),
+    login: <T = AuthResult>(body: unknown, opts?: ApiClientOptions) =>
+      login<T>(body, withDefaults(opts)),
+    me: <T = AuthResult>(opts?: ApiClientOptions) => me<T>(withDefaults(opts)),
+
     health: () => getHealth(withDefaults()),
 
     createAthlete: <T = unknown>(body: unknown, opts?: ApiClientOptions) =>
@@ -102,8 +120,35 @@ export function createApiClient(options: ApiClientOptions = {}) {
     getAthleteHistory: <T = unknown>(athleteId: string, query: { from?: string; to?: string }, opts?: ApiClientOptions) =>
       getAthleteHistory<T>(athleteId, query, withDefaults(opts)),
     calculateLoadZones: <T = unknown>(athleteId: string, body: unknown, opts?: ApiClientOptions) =>
-      calculateLoadZones<T>(athleteId, body, withDefaults(opts))
+      calculateLoadZones<T>(athleteId, body, withDefaults(opts)),
+
+    compareAthletes: <T = unknown>(body: unknown, opts?: ApiClientOptions) =>
+      compareAthletes<T>(body, withDefaults(opts)),
+
+    getAdminUsers: <T = unknown>(query?: Record<string, any>, opts?: ApiClientOptions) =>
+      getAdminUsers<T>(query, withDefaults(opts)),
+    createAdminUser: <T = unknown>(body: unknown, opts?: ApiClientOptions) =>
+      createAdminUser<T>(body, withDefaults(opts)),
+    getAdminSensorTypes: <T = unknown>(query?: Record<string, any>, opts?: ApiClientOptions) =>
+      getAdminSensorTypes<T>(query, withDefaults(opts)),
+    getAdminSensorCatalog: <T = unknown>(opts?: ApiClientOptions) =>
+      getAdminSensorCatalog<T>(withDefaults(opts)),
+    upsertAdminSensorType: <T = unknown>(body: unknown, opts?: ApiClientOptions) =>
+      upsertAdminSensorType<T>(body, withDefaults(opts))
   }
+}
+
+// Auth
+export function register<T = AuthResult>(body: unknown, opts?: ApiClientOptions) {
+  return request<T>('/auth/register', { ...opts, method: 'POST', body })
+}
+
+export function login<T = AuthResult>(body: unknown, opts?: ApiClientOptions) {
+  return request<T>('/auth/login', { ...opts, method: 'POST', body })
+}
+
+export function me<T = AuthResult>(opts?: ApiClientOptions) {
+  return request<T>('/auth/me', opts)
 }
 
 export function getHealth<T = unknown>(opts?: ApiClientOptions) {
@@ -206,3 +251,29 @@ export function calculateLoadZones<T = unknown>(athleteId: string, body: unknown
     body
   })
 }
+
+export function compareAthletes<T = unknown>(body: unknown, opts?: ApiClientOptions) {
+  return request<T>('/analytics/compare-athletes', { ...opts, method: 'POST', body })
+}
+
+// Admin
+export function getAdminUsers<T = unknown>(query?: Record<string, any>, opts?: ApiClientOptions) {
+  return request<T>(`/admin/users${buildQuery(query)}`, opts)
+}
+
+export function createAdminUser<T = unknown>(body: unknown, opts?: ApiClientOptions) {
+  return request<T>('/admin/users', { ...opts, method: 'POST', body })
+}
+
+export function getAdminSensorTypes<T = unknown>(query?: Record<string, any>, opts?: ApiClientOptions) {
+  return request<T>(`/admin/sensor-types${buildQuery(query)}`, opts)
+}
+
+export function getAdminSensorCatalog<T = unknown>(opts?: ApiClientOptions) {
+  return request<T>('/admin/sensor-catalog', opts)
+}
+
+export function upsertAdminSensorType<T = unknown>(body: unknown, opts?: ApiClientOptions) {
+  return request<T>('/admin/sensor-types', { ...opts, method: 'POST', body })
+}
+

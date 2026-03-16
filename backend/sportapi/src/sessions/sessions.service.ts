@@ -91,4 +91,28 @@ export class SessionsService {
 
     return this.collection().findOne({ sessionId });
   }
+
+  async updateNotes(sessionId: string, body: any, user: RequestUser) {
+    const session = await this.getById(sessionId, user);
+
+    if (body.notes === undefined || body.notes === null) {
+      throw new BadRequestException('notes is required');
+    }
+
+    const notes = String(body.notes);
+    const append = body.append === true;
+    const updatedNotes = append && session.notes ? `${session.notes}\n${notes}` : notes;
+
+    await this.collection().updateOne(
+      { sessionId },
+      {
+        $set: {
+          notes: updatedNotes,
+          updatedAt: new Date()
+        }
+      }
+    );
+
+    return this.collection().findOne({ sessionId });
+  }
 }

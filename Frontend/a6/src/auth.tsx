@@ -1,13 +1,13 @@
-import { createContext, useContext, useMemo, useState, useEffect } from "react";
-import type { ReactNode } from "react"
-import type { User  } from "./types.ts"
-
-
-
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
+import { clearStoredAuthSession, readStoredAuthSession, writeStoredAuthSession } from "./lib/auth-storage";
+import type { StoredAuthSession } from "./lib/auth-storage";
+import type { ApiAuth, User } from "./types";
 
 type AuthContextValue = {
     user: User | null;
-    login: (user: User) => void;
+    apiAuth: ApiAuth | null;
+    login: (payload: StoredAuthSession) => void;
     logout: () => void;
 };
 
@@ -15,29 +15,29 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
+    const [apiAuth, setApiAuth] = useState<ApiAuth | null>(null);
 
     useEffect(() => {
-        const stored = localStorage.getItem("app:user");
+        const stored = readStoredAuthSession();
         if (stored) {
-            try {
-                setUser(JSON.parse(stored));
-            } catch {
-                // ignore
-            }
+            setUser(stored.user);
+            setApiAuth(stored.apiAuth);
         }
     }, []);
 
-    const login = (u: User) => {
-        setUser(u);
-        localStorage.setItem("app:user", JSON.stringify(u));
+    const login = (payload: StoredAuthSession) => {
+        setUser(payload.user);
+        setApiAuth(payload.apiAuth);
+        writeStoredAuthSession(payload);
     };
 
     const logout = () => {
         setUser(null);
-        localStorage.removeItem("app:user");
+        setApiAuth(null);
+        clearStoredAuthSession();
     };
 
-    const value = useMemo(() => ({ user, login, logout }), [user]);
+    const value = useMemo(() => ({ user, apiAuth, login, logout }), [user, apiAuth]);
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
