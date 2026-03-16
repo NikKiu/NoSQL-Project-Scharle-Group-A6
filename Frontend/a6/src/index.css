@@ -563,11 +563,66 @@ textarea:focus {
   min-height: 320px;
 }
 
+.chart-title {
+  margin: 0 0 10px;
+  font-weight: 700;
+  color: #10213a;
+}
+
 .chart-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 16px;
   margin-bottom: 16px;
+}
+
+.comparison-chart-tile {
+  aspect-ratio: 1 / 1;
+  min-height: 390px;
+  max-height: 460px;
+}
+
+.comparison-chart-grid {
+  column-gap: 28px;
+  row-gap: 56px;
+  margin-top: 8px;
+  margin-bottom: 22px;
+}
+
+.inline-loader {
+  margin: 6px 0 14px;
+  color: var(--text-soft);
+  font-weight: 600;
+}
+
+.route-map {
+  padding: 12px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  max-width: 980px;
+  margin-inline: auto;
+}
+
+.route-map--empty {
+  display: grid;
+  gap: 8px;
+}
+
+.route-map__canvas {
+  width: 100%;
+  height: clamp(240px, 34vw, 420px);
+  border-radius: 14px;
+  border: 1px solid #d8e2f3;
+  display: block;
+}
+
+.route-map__legend {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  color: var(--text-soft);
 }
 
 .empty-state,

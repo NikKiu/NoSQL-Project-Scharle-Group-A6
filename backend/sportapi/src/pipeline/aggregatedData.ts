@@ -1299,13 +1299,112 @@ export async function getDetailedSessionAnalysis(
         // Sensor-spezifische Statistiken
         bySensorType: [
           {
+            $addFields: {
+              hrValue: { $ifNull: ['$heartRate', '$metrics.heartRate'] },
+              speedValue: { $ifNull: ['$speed', '$metrics.speed'] },
+              distanceValue: { $ifNull: ['$distanceDelta', '$metrics.distanceDelta'] },
+              powerValue: { $ifNull: ['$powerW', { $ifNull: ['$metrics.powerW', '$metrics.power'] }] },
+              latValue: { $ifNull: ['$lat', '$metrics.lat'] },
+              lonValue: { $ifNull: ['$lon', '$metrics.lon'] }
+            }
+          },
+          {
             $group: {
               _id: '$sensorType',
               eventCount: { $sum: 1 },
-              avgHeartRate: { $avg: '$heartRate' },
-              avgSpeed: { $avg: '$speed' }
+              avgHeartRate: { $avg: '$hrValue' },
+              minHeartRate: { $min: '$hrValue' },
+              maxHeartRate: { $max: '$hrValue' },
+              avgSpeed: { $avg: '$speedValue' },
+              maxSpeed: { $max: '$speedValue' },
+              totalDistance: { $sum: { $ifNull: ['$distanceValue', 0] } },
+              avgPowerW: { $avg: '$powerValue' },
+              maxPowerW: { $max: '$powerValue' },
+              gpsPointCount: {
+                $sum: {
+                  $cond: [
+                    { $and: [{ $ne: ['$latValue', null] }, { $ne: ['$lonValue', null] }] },
+                    1,
+                    0
+                  ]
+                }
+              }
             }
+          },
+          {
+            $project: {
+              _id: 1,
+              eventCount: 1,
+              metrics: {
+                $switch: {
+                  branches: [
+                    {
+                      case: { $eq: ['$_id', 'heart-rate'] },
+                      then: {
+                        avgHeartRate: { $round: ['$avgHeartRate', 1] },
+                        minHeartRate: '$minHeartRate',
+                        maxHeartRate: '$maxHeartRate'
+                      }
+                    },
+                    {
+                      case: { $eq: ['$_id', 'gps'] },
+                      then: {
+                        avgSpeed: { $round: ['$avgSpeed', 2] },
+                        maxSpeed: { $round: ['$maxSpeed', 2] },
+                        totalDistanceM: { $round: ['$totalDistance', 2] },
+                        gpsPointCount: '$gpsPointCount'
+                      }
+                    },
+                    {
+                      case: { $eq: ['$_id', 'power'] },
+                      then: {
+                        avgPowerW: { $round: ['$avgPowerW', 1] },
+                        maxPowerW: '$maxPowerW'
+                      }
+                    }
+                  ],
+                  default: {
+                    avgHeartRate: { $round: ['$avgHeartRate', 1] },
+                    avgSpeed: { $round: ['$avgSpeed', 2] },
+                    totalDistanceM: { $round: ['$totalDistance', 2] },
+                    avgPowerW: { $round: ['$avgPowerW', 1] }
+                  }
+                }
+              }
+            }
+          },
+          {
+            $sort: { _id: 1 }
           }
+        ],
+        gpsTrack: [
+          {
+            $addFields: {
+              latValue: { $ifNull: ['$lat', '$metrics.lat'] },
+              lonValue: { $ifNull: ['$lon', '$metrics.lon'] },
+              speedValue: { $ifNull: ['$speed', '$metrics.speed'] },
+              distanceValue: { $ifNull: ['$distanceDelta', '$metrics.distanceDelta'] }
+            }
+          },
+          {
+            $match: {
+              sensorType: 'gps',
+              latValue: { $ne: null },
+              lonValue: { $ne: null }
+            }
+          },
+          { $sort: { timestamp: 1 } },
+          {
+            $project: {
+              _id: 0,
+              timestamp: 1,
+              lat: '$latValue',
+              lon: '$lonValue',
+              speed: '$speedValue',
+              distanceDelta: '$distanceValue'
+            }
+          },
+          { $limit: 5000 }
         ]
       }
     }
@@ -1327,7 +1426,8 @@ export async function getDetailedSessionAnalysis(
     } : null,
     summary: result?.summary[0] || {},
     timeSeriesData: result?.timeSeriesData || [],
-    bySensorType: result?.bySensorType || []
+    bySensorType: result?.bySensorType || [],
+    gpsTrack: result?.gpsTrack || []
   };
 }
 

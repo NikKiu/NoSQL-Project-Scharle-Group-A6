@@ -131,6 +131,27 @@ export class AdminService {
     this.requireAdmin(user);
 
     const sensorType = ensureString(body.sensorType ?? body.type, 'sensorType');
+    const allowedGeneratorTypes = new Set(['heart-rate', 'gps', 'power', 'custom']);
+    const rawGeneratorType = body.generatorType?.toString().trim();
+    const generatorType = rawGeneratorType && rawGeneratorType.length > 0 ? rawGeneratorType : undefined;
+
+    if (generatorType && !allowedGeneratorTypes.has(generatorType)) {
+      throw new BadRequestException('generatorType must be one of: heart-rate, gps, power, custom');
+    }
+
+    const rawConfig = body.generatorConfig;
+    const generatorConfig = rawConfig && typeof rawConfig === 'object' && !Array.isArray(rawConfig)
+      ? {
+          metricKey: rawConfig.metricKey?.toString().trim() || undefined,
+          base: Number.isFinite(Number(rawConfig.base)) ? Number(rawConfig.base) : undefined,
+          amplitude: Number.isFinite(Number(rawConfig.amplitude)) ? Number(rawConfig.amplitude) : undefined,
+          noise: Number.isFinite(Number(rawConfig.noise)) ? Number(rawConfig.noise) : undefined,
+          min: Number.isFinite(Number(rawConfig.min)) ? Number(rawConfig.min) : undefined,
+          max: Number.isFinite(Number(rawConfig.max)) ? Number(rawConfig.max) : undefined,
+          frequencyDivisor: Number.isFinite(Number(rawConfig.frequencyDivisor)) ? Number(rawConfig.frequencyDivisor) : undefined
+        }
+      : undefined;
+
     const now = new Date();
 
     await this.mongoService.getDb().collection('sensor_types').updateOne(
@@ -141,6 +162,8 @@ export class AdminService {
           displayName: body.displayName?.toString().trim() || sensorType,
           unit: body.unit?.toString().trim() || null,
           description: body.description?.toString().trim() || null,
+          generatorType: generatorType ?? null,
+          generatorConfig: generatorConfig ?? null,
           updatedAt: now
         },
         $setOnInsert: {

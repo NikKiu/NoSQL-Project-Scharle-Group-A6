@@ -87,6 +87,42 @@ export interface SensorEvent {
   heartRate?: number
   speed?: number
   distanceDelta?: number
+  lat?: number
+  lon?: number
+  powerW?: number
+}
+
+export interface GpsTrackPoint {
+  timestamp: string
+  lat: number
+  lon: number
+  speed?: number | null
+  distanceDelta?: number | null
+}
+
+export interface SessionSensorBreakdown {
+  _id: string
+  eventCount: number
+  metrics: Record<string, number | null>
+}
+
+export interface DetailedSessionAnalysis {
+  sessionId: string
+  summary: Record<string, unknown>
+  timeSeriesData: Array<{
+    _id: string
+    avgHeartRate?: number | null
+    avgSpeed?: number | null
+    distanceCovered?: number | null
+    eventCount?: number
+  }>
+  bySensorType: SessionSensorBreakdown[]
+  gpsTrack: GpsTrackPoint[]
+  athlete?: {
+    athleteId: string
+    name: string
+    trainingLevel?: string | null
+  } | null
 }
 
 export interface TimePoint {
@@ -117,8 +153,32 @@ export interface SensorCatalogItem {
   displayName: string
   unit?: string | null
   description?: string | null
+  generatorType?: 'heart-rate' | 'gps' | 'power' | 'custom'
+  generatorConfig?: {
+    metricKey?: string
+    base?: number
+    amplitude?: number
+    noise?: number
+    min?: number
+    max?: number
+    frequencyDivisor?: number
+  }
   createdAt?: string
   updatedAt?: string
+}
+
+export interface SimulatedSampleResponse {
+  insertedCount: number
+  timestamp: string
+  events: SensorEvent[]
+  sample: {
+    heartRate?: number
+    speed?: number
+    distanceDelta?: number
+    lat?: number
+    lon?: number
+    powerW?: number
+  }
 }
 
 export interface SessionSummary {
