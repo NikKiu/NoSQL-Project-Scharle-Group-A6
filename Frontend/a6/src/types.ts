@@ -125,29 +125,6 @@ export interface DetailedSessionAnalysis {
   } | null
 }
 
-export interface TimePoint {
-  ts: string
-  hr?: number
-  speedKmh?: number
-  lat?: number
-  lon?: number
-  powerW?: number
-}
-
-export interface TimeSeries {
-  trainingId: string
-  athleteId?: string
-  sportlerId?: string
-  points: TimePoint[]
-}
-
-export interface Sensor {
-  id?: string
-  name: string
-  type: string
-  details?: string
-}
-
 export interface SensorCatalogItem {
   sensorType: string
   displayName: string
@@ -195,16 +172,6 @@ export interface SessionSummary {
   eventCount?: number
   firstEventAt?: string | null
   lastEventAt?: string | null
-}
-
-export interface AthleteHistoryResponse {
-  athleteId: string
-  sessions: SessionSummary[]
-}
-
-export interface MetricPoint {
-  label: string
-  value: number | string | null
 }
 
 export interface TrainerAssignment {
