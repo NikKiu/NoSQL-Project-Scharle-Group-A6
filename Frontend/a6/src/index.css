@@ -589,6 +589,14 @@ textarea:focus {
   margin-bottom: 22px;
 }
 
+.monitoring-chart-grid {
+  margin-top: 18px;
+}
+
+.monitoring-chart-grid .comparison-chart-tile {
+  min-height: 360px;
+}
+
 .inline-loader {
   margin: 6px 0 14px;
   color: var(--text-soft);
