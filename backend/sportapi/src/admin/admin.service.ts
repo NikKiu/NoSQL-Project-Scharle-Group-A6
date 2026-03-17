@@ -11,6 +11,13 @@ import { ensureString } from '../common/utils/parse';
 export class AdminService {
   constructor(private readonly mongoService: MongoService) {}
 
+  private toPublicUser(user: any) {
+    if (!user) return null;
+
+    const { _id: _mongoId, passwordHash: _passwordHash, ...publicUser } = user;
+    return publicUser;
+  }
+
   private hashPassword(password: string): string {
     const pepper = process.env.AUTH_PASSWORD_PEPPER || 'dev-pepper';
     return createHash('sha256').update(`${pepper}:${password}`).digest('hex');
@@ -79,6 +86,8 @@ export class AdminService {
   }
 
   async getSensorCatalog(user: RequestUser) {
+    this.requireAdmin(user);
+
     return this.mongoService
       .getDb()
       .collection('sensor_types')
@@ -123,8 +132,102 @@ export class AdminService {
     };
 
     await users.insertOne(createdUser as any);
+
+    if (role === 'athlete' && createdUser.athleteId) {
+      await this.mongoService.getDb().collection('athletes').updateOne(
+        { athleteId: createdUser.athleteId },
+        {
+          $setOnInsert: {
+            id: createdUser.athleteId,
+            athleteId: createdUser.athleteId,
+            userId,
+            firstName: body.firstName?.toString().trim() || createdUser.name,
+            lastName: body.lastName?.toString().trim() || 'Athlete',
+            birthDate: new Date('2000-01-01T00:00:00.000Z'),
+            gender: body.gender?.toString().trim() || 'unknown',
+            trainingLevel: 'beginner',
+            sports: Array.isArray(body.sports) && body.sports.length > 0 ? body.sports : ['running'],
+            createdAt: now,
+            updatedAt: now
+          }
+        },
+        { upsert: true }
+      );
+    }
+
     const { passwordHash: _ignored, ...publicUser } = createdUser as any;
     return { created: true, user: publicUser };
+  }
+
+  async updateUserRole(userId: string, body: any, user: RequestUser) {
+    this.requireAdmin(user);
+
+    const nextRole = ensureString(body.role, 'role');
+    if (!['admin', 'trainer', 'athlete'].includes(nextRole)) {
+      throw new BadRequestException('Invalid role. Allowed values: admin, trainer, athlete');
+    }
+
+    if (user.userId === userId && user.role !== nextRole) {
+      throw new ForbiddenException('Die eigene Admin-Rolle kann nicht geändert werden');
+    }
+
+    const db = this.mongoService.getDb();
+    const users = db.collection('users');
+    const existingUser = await users.findOne({ userId });
+
+    if (!existingUser) {
+      throw new BadRequestException('User not found');
+    }
+
+    const now = new Date();
+    const athleteId = nextRole === 'athlete' ? existingUser.athleteId?.toString().trim() || createId('athlete') : null;
+    const trainerAthleteIds =
+      nextRole === 'trainer' && Array.isArray(existingUser.trainerAthleteIds) ? existingUser.trainerAthleteIds : [];
+
+    await users.updateOne(
+      { userId },
+      {
+        $set: {
+          role: nextRole,
+          athleteId,
+          trainerAthleteIds,
+          updatedAt: now
+        }
+      }
+    );
+
+    if (nextRole === 'athlete' && athleteId) {
+      await db.collection('athletes').updateOne(
+        { athleteId },
+        {
+          $setOnInsert: {
+            id: athleteId,
+            athleteId,
+            userId: existingUser.userId,
+            firstName: existingUser.name?.toString().trim() || existingUser.email?.split('@')[0] || 'New',
+            lastName: 'Athlete',
+            birthDate: new Date('2000-01-01T00:00:00.000Z'),
+            gender: 'unknown',
+            trainingLevel: 'beginner',
+            sports: ['running'],
+            createdAt: now,
+            updatedAt: now
+          },
+          $set: {
+            userId: existingUser.userId,
+            updatedAt: now
+          }
+        },
+        { upsert: true }
+      );
+    }
+
+    const updatedUser = await users.findOne({ userId }, { projection: { _id: 0, passwordHash: 0 } });
+
+    return {
+      updated: true,
+      user: this.toPublicUser(updatedUser)
+    };
   }
 
   async upsertSensorType(body: any, user: RequestUser) {

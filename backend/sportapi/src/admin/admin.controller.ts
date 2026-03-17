@@ -87,6 +87,11 @@ export class AdminController {
     return this.adminService.createUser(body, getRequestUser(req));
   }
 
+  @Patch('users/:userId/role')
+  updateUserRole(@Param('userId') userId: string, @Body() body: any, @Req() req: any) {
+    return this.adminService.updateUserRole(userId, body, getRequestUser(req));
+  }
+
   @Post('sensor-types')
   upsertSensorType(@Body() body: any, @Req() req: any) {
     return this.adminService.upsertSensorType(body, getRequestUser(req));

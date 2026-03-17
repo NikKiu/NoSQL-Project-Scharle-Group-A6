@@ -140,6 +140,8 @@ Nach dem Seed-Lauf stehen folgende Benutzer sofort zur Verfügung:
 | Sportler | `lisa@sport.local`    | `athlete123` | Training, Historie, Profil                          |
 | Sportler | `tom@sport.local`     | `athlete123` | Training, Historie, Profil                          |
 
+> **Rollen ändern:** Der Admin kann über `GET /api/admin/users` alle Nutzer abrufen und deren Rolle via `PATCH /api/admin/users/:userId/role` ändern. Die Rollenwechsel sind im Frontend in der Seite **Admin → Alle Nutzer** direkt möglich (Dropdown pro Nutzer).
+
 ---
 
 ## Projektstruktur
@@ -207,50 +209,61 @@ NoSQL-Project-Scharle-Group-A6/
 
 ### Sessions
 
-| Methode | Pfad                       | Beschreibung                          |
-|---------|----------------------------|---------------------------------------|
-| `POST`  | `/api/sessions`            | Training starten                      |
-| `GET`   | `/api/sessions/:id`        | Session abrufen                       |
-| `PATCH` | `/api/sessions/:id/finish` | Training beenden                      |
-| `PATCH` | `/api/sessions/:id`        | Session aktualisieren (z. B. Notizen) |
+| Methode | Pfad                                | Beschreibung            |
+|---------|-------------------------------------|-------------------------|
+| `POST`  | `/api/sessions`                     | Training starten        |
+| `GET`   | `/api/sessions/:sessionId`          | Session abrufen         |
+| `PATCH` | `/api/sessions/:sessionId/finish`   | Training beenden        |
+| `PATCH` | `/api/sessions/:sessionId/notes`    | Notizen aktualisieren   |
+| `GET`   | `/api/athletes/:athleteId/sessions` | Sessions eines Athleten |
 
 ### Sensor-Events
 
-| Methode | Pfad                       | Beschreibung                    |
-|---------|----------------------------|---------------------------------|
-| `POST`  | `/api/sensor-events`       | Einzelner Messpunkt             |
-| `POST`  | `/api/sensor-events/batch` | Batch-Ingest (bis 5.000 Events) |
+| Methode | Pfad                                            | Beschreibung                        |
+|---------|-------------------------------------------------|-------------------------------------|
+| `POST`  | `/api/sensor-events`                            | Einzelner Messpunkt                 |
+| `POST`  | `/api/sensor-events/batch`                      | Batch-Ingest (bis 5.000 Events)     |
+| `POST`  | `/api/sensor-events/simulate`                   | Simulierte Events für Training      |
+| `GET`   | `/api/athletes/:athleteId/sensor-events/recent` | Letzte Sensor-Events eines Athleten |
 
 ### Analytics
 
-| Methode | Pfad                                              | Beschreibung                             |
-|---------|---------------------------------------------------|------------------------------------------|
-| `GET`   | `/api/analytics/athletes/:id/all-time-stats`      | Gesamtstatistik                          |
-| `GET`   | `/api/analytics/athletes/:id/history-enhanced`    | Trainingshistorie                        |
-| `GET`   | `/api/analytics/athletes/:id/avg-per-session`     | Ø-Werte je Session                       |
-| `GET`   | `/api/analytics/athletes/:id/sport-stats`         | Statistik nach Sportart                  |
-| `GET`   | `/api/analytics/athletes/:id/performance-metrics` | Leistungsmetriken                        |
-| `GET`   | `/api/analytics/sessions/:id/summary`             | Session-Zusammenfassung                  |
-| `GET`   | `/api/analytics/sessions/:id/detailed`            | Detailanalyse (Zeitreihe, GPS, HR-Zonen) |
-| `GET`   | `/api/analytics/sessions/:id/hr-zones`            | Herzfrequenz-Zonen                       |
-| `POST`  | `/api/analytics/compare-athletes`                 | Athletenvergleich                        |
-| `POST`  | `/api/analytics/live-overview`                    | Echtzeit-Übersicht                       |
-| `GET`   | `/api/analytics/leaderboard`                      | Bestenliste                              |
+| Methode | Pfad                                                      | Beschreibung                             |
+|---------|-----------------------------------------------------------|------------------------------------------|
+| `GET`   | `/api/analytics/athletes/:athleteId/all-time-stats`       | Gesamtstatistik                          |
+| `GET`   | `/api/analytics/athletes/:athleteId/history-enhanced`     | Trainingshistorie mit Details            |
+| `GET`   | `/api/analytics/athletes/:athleteId/avg-per-session`      | Ø-Werte je Session                       |
+| `GET`   | `/api/analytics/athletes/:athleteId/sport-stats`          | Statistik nach Sportart                  |
+| `GET`   | `/api/analytics/athletes/:athleteId/performance-metrics`  | Leistungsmetriken                        |
+| `GET`   | `/api/analytics/athletes/:athleteId/average-heart-rate`   | Durchschnittliche Herzfrequenz           |
+| `GET`   | `/api/analytics/athletes/:athleteId/history`              | Trainingshistorie (klassisch)            |
+| `GET`   | `/api/analytics/athletes/:athleteId/progress`             | Fortschrittsanalyse (Metric-Trend)       |
+| `GET`   | `/api/analytics/sessions/:sessionId/summary`              | Session-Zusammenfassung                  |
+| `GET`   | `/api/analytics/sessions/:sessionId/detailed`             | Detailanalyse (Zeitreihe, GPS, HR-Zonen) |
+| `GET`   | `/api/analytics/sessions/:sessionId/hr-zones`             | Herzfrequenz-Zonen-Analyse               |
+| `GET`   | `/api/analytics/leaderboard`                              | Bestenliste (nach Sport/Metrik)          |
+| `GET`   | `/api/analytics/compare-training-levels`                  | Vergleich nach Trainingslevel            |
+| `GET`   | `/api/analytics/sessions-with-notes`                      | Sessions mit Notizen                     |
+| `POST`  | `/api/analytics/compare-athletes`                         | Mehrsportler-Vergleich                   |
+| `POST`  | `/api/analytics/compare-sessions`                         | Vergleich mehrerer Sessions              |
+| `POST`  | `/api/analytics/live-overview`                            | Echtzeit-Übersicht mehrerer Athleten     |
+| `POST`  | `/api/analytics/athletes/:athleteId/load-zones/calculate` | HR-Zonen-Berechnung                      |
 
 ### Admin
 
-| Methode | Pfad                               | Beschreibung                    |
-|---------|------------------------------------|---------------------------------|
-| `GET`   | `/api/admin/users`                 | Alle Nutzer                     |
-| `POST`  | `/api/admin/users`                 | Nutzer anlegen                  |
-| `GET`   | `/api/admin/sensor-catalog`        | Sensor-Katalog                  |
-| `POST`  | `/api/admin/sensor-types`          | Sensortyp anlegen/aktualisieren |
-| `GET`   | `/api/admin/system-metrics`        | Systemmetriken                  |
-| `GET`   | `/api/admin/write-performance`     | Schreibleistung                 |
-| `GET`   | `/api/admin/audit-logs`            | Audit-Logs                      |
-| `GET`   | `/api/admin/data-volume-by-sport`  | Datenvolumen nach Sportart      |
-| `GET`   | `/api/admin/trainer-assignments`   | Trainer-Sportler-Zuordnungen    |
-| `PATCH` | `/api/admin/trainers/:id/athletes` | Zuordnung bearbeiten            |
+| Methode | Pfad                                      | Beschreibung                    |
+|---------|-------------------------------------------|---------------------------------|
+| `GET`   | `/api/admin/users`                        | Alle Nutzer                     |
+| `POST`  | `/api/admin/users`                        | Nutzer anlegen                  |
+| `PATCH` | `/api/admin/users/:userId/role`           | Nutzerrolle ändern              |
+| `GET`   | `/api/admin/sensor-catalog`               | Sensor-Katalog                  |
+| `POST`  | `/api/admin/sensor-types`                 | Sensortyp anlegen/aktualisieren |
+| `GET`   | `/api/admin/system-metrics`               | Systemmetriken                  |
+| `GET`   | `/api/admin/write-performance`            | Schreibleistung                 |
+| `GET`   | `/api/admin/audit-logs`                   | Audit-Logs                      |
+| `GET`   | `/api/admin/data-volume-by-sport`         | Datenvolumen nach Sportart      |
+| `GET`   | `/api/admin/trainer-assignments`          | Trainer-Sportler-Zuordnungen    |
+| `PATCH` | `/api/admin/trainers/:trainerId/athletes` | Zuordnung bearbeiten            |
 
 ---
 
