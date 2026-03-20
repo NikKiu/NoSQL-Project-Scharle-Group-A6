@@ -348,25 +348,25 @@ db.createCollection("sensor_events", {
 
 ## Anforderungs-Mapping
 
-| Funktion | Anforderungen | User Stories |
-|----------|---------------|--------------|
-| `getAthletePerformanceMetrics` | F10, NF4 | US 6, 7 |
-| `getTrainingHistory` | F10, NF4 | US 7, 16 |
-| `compareAthletes` | F17, F22, NF10 | US 13, 19 |
-| `getSportStatistics` | F10, NF4 | US 5 |
-| `getSystemMetrics` | F14, F16, NF1, NF3 | US 8 |
-| `getSessionComparison` | F10, F17 | US 17 |
-| `getHeartRateZoneAnalysis` | F10 | - |
-| `getDataVolumePerSport` | F16 | US 12 |
-| `getProgressOverTime` | F10 | US 6, 7 |
-| `getLiveTrainingOverview` | F17, NF10, NF2 | US 14 |
-| `getAuditLogSummary` | F15, F23, NF7 | US 11 |
-| `getSensorTypeUsageStats` | F13, F16 | US 9, 12 |
-| `compareTrainingLevels` | F10 | US 19 |
-| `getSessionsWithNotes` | F21 | US 15 |
-| `getWritePerformanceMetrics` | NF1, NF3, F14 | US 8 |
-| `getDetailedSessionAnalysis` | F10, NF9 | US 3, 7 |
-| `getSportLeaderboard` | F10, NF10 | US 19 |
+| Funktion                       | Anforderungen      | User Stories |
+|--------------------------------|--------------------|--------------|
+| `getAthletePerformanceMetrics` | F10, NF4           | US 6, 7      |
+| `getTrainingHistory`           | F10, NF4           | US 7, 16     |
+| `compareAthletes`              | F17, F22, NF10     | US 13, 19    |
+| `getSportStatistics`           | F10, NF4           | US 5         |
+| `getSystemMetrics`             | F14, F16, NF1, NF3 | US 8         |
+| `getSessionComparison`         | F10, F17           | US 17        |
+| `getHeartRateZoneAnalysis`     | F10                | -            |
+| `getDataVolumePerSport`        | F16                | US 12        |
+| `getProgressOverTime`          | F10                | US 6, 7      |
+| `getLiveTrainingOverview`      | F17, NF10, NF2     | US 14        |
+| `getAuditLogSummary`           | F15, F23, NF7      | US 11        |
+| `getSensorTypeUsageStats`      | F13, F16           | US 9, 12     |
+| `compareTrainingLevels`        | F10                | US 19        |
+| `getSessionsWithNotes`         | F21                | US 15        |
+| `getWritePerformanceMetrics`   | NF1, NF3, F14      | US 8         |
+| `getDetailedSessionAnalysis`   | F10, NF9           | US 3, 7      |
+| `getSportLeaderboard`          | F10, NF10          | US 19        |
 
 ## Testing
 

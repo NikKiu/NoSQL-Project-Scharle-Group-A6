@@ -13,14 +13,6 @@ export function parseOptionalDate(value: any, fieldName: string): Date | undefin
   return parseDate(value, fieldName);
 }
 
-export function parsePositiveNumber(value: any, fieldName: string): number {
-  const num = Number(value);
-  if (!Number.isFinite(num) || num <= 0) {
-    throw new BadRequestException(`${fieldName} must be a positive number`);
-  }
-  return num;
-}
-
 export function parseOptionalNumber(value: any, fieldName: string): number | undefined {
   if (value === undefined || value === null || value === '') return undefined;
   const num = Number(value);

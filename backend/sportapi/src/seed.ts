@@ -12,7 +12,6 @@ async function seed() {
   const hashPassword = (password: string) =>
     createHash('sha256').update(`${process.env.AUTH_PASSWORD_PEPPER || 'dev-pepper'}:${password}`).digest('hex');
 
-  // ==================== USERS ====================
   const users = [
     {
       id: 'admin-1',
@@ -125,7 +124,6 @@ async function seed() {
     )
   );
 
-  // ==================== ATHLETES ====================
   const athletes = [
     {
       id: 'athlete-1',
@@ -250,7 +248,6 @@ async function seed() {
     )
   );
 
-  // ==================== TRAINING SESSIONS ====================
   console.log('Creating training sessions...');
   const sessions = [];
   const allSensorEvents = [];
@@ -320,7 +317,6 @@ async function seed() {
     )
   );
 
-  // ==================== SENSOR EVENTS ====================
   console.log('Creating sensor events (this may take a while)...');
 
   // Helper to generate realistic sensor data
@@ -481,7 +477,6 @@ async function seed() {
   }
   console.log('\n');
 
-  // ==================== AUDIT LOGS ====================
   console.log('Creating audit logs...');
   await db.collection('audit_logs').deleteMany({});
   const auditLogs = [];
@@ -506,7 +501,6 @@ async function seed() {
 
   await db.collection('audit_logs').insertMany(auditLogs);
 
-  // ==================== SENSOR TYPES ====================
   await db.collection('sensor_types').deleteMany({});
   await db.collection('sensor_types').insertMany([
     {
@@ -562,8 +556,7 @@ async function seed() {
     }
   ]);
 
-  // ==================== SUMMARY ====================
-  console.log('\n✅ Seed completed successfully!\n');
+  console.log('\n Seed completed successfully!\n');
   console.log('Data Summary:');
   console.log(`   - Users: ${users.length}`);
   console.log(`   - Athletes: ${athletes.length}`);
