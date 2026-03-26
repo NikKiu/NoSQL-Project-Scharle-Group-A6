@@ -3,6 +3,7 @@ export type Role = 'athlete' | 'trainer' | 'admin'
 export interface ApiAuth {
   userId: string
   role: Role
+  token: string
 }
 
 export interface User {

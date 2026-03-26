@@ -4,6 +4,7 @@
 - Globaler Prefix: `/api`
 - Modul-Routen: root-basiert (`/sessions` und `/athletes/:athleteId/sessions`)
 - Auth: Bearer Token erforderlich
+- Zugriff: serverseitig an Session-/Athletenrechte gebunden (eigene Daten, zugewiesene Trainerdaten, Admin)
 
 ## Endpunkte
 - `POST /api/sessions` - Trainingssession starten/anlegen

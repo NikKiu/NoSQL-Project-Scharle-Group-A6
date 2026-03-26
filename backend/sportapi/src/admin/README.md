@@ -3,8 +3,8 @@
 ## Scope
 - Globaler Prefix: `/api`
 - Modul-Base-Path: `/admin`
-- Auth: Bearer Token erforderlich
-- Rolle: für Admin-Endpunkte vorgesehen; Prüfung erfolgt im Service
+- Auth: Bearer Token erforderlich (Ausnahme: `GET /api/admin/sensor-catalog` ist öffentlich)
+- Rolle: für alle anderen Endpunkte `admin`; Prüfung erfolgt im Service
 
 ## Endpunkte
 - `GET /api/admin/system-metrics` - Systemmetriken abrufen (`from`, `to` optional)
@@ -13,7 +13,7 @@
 - `GET /api/admin/sensor-types` - Sensor-Statistiken abrufen
 - `GET /api/admin/data-volume-by-sport` - Datenvolumen je Sportart abrufen
 - `GET /api/admin/users` - Nutzerliste abrufen
-- `GET /api/admin/sensor-catalog` - Sensor-Katalog abrufen
+- `GET /api/admin/sensor-catalog` - Sensor-Katalog abrufen (öffentlich)
 - `GET /api/admin/trainer-assignments` - Trainer-Sportler-Zuordnungen abrufen
 - `POST /api/admin/users` - Nutzer anlegen
 - `PATCH /api/admin/users/:userId/role` - Rolle eines Nutzers aktualisieren

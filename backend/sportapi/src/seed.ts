@@ -566,7 +566,7 @@ async function seed() {
   console.log('   - Sensor Types: 3');
   console.log('');
 
-  console.log('Test User Credentials (use these headers in Postman/curl):');
+  console.log('Test User Credentials (Login -> Bearer Token verwenden):');
   console.log('   Login credentials:');
   console.log('      admin@sport.local / admin123');
   console.log('      trainer@sport.local / trainer123');
@@ -577,20 +577,10 @@ async function seed() {
   console.log('      tom@sport.local / athlete123');
   console.log('');
 
-  console.log('Header auth (legacy mode):');
-  console.log('   Admin:');
-  console.log('      x-user-id: admin-1');
-  console.log('      x-role: admin');
-  console.log('   Trainer:');
-  console.log('      x-user-id: trainer-1');
-  console.log('      x-role: trainer');
-  console.log('   Athletes:');
-  console.log('      x-user-id: athlete-user-1 (Alex Meyer)');
-  console.log('      x-user-id: athlete-user-2 (Sarah Schmidt)');
-  console.log('      x-user-id: athlete-user-3 (Max Müller)');
-  console.log('      x-user-id: athlete-user-4 (Lisa Wagner)');
-  console.log('      x-user-id: athlete-user-5 (Tom Fischer)');
-  console.log('      x-role: athlete');
+  console.log('Auth Ablauf:');
+  console.log('   1) POST /api/auth/login mit email + password');
+  console.log('   2) auth.token aus der Antwort kopieren');
+  console.log('   3) In allen geschützten Requests senden: Authorization: Bearer <token>');
   console.log('');
 
   console.log('Test Scenarios:');

@@ -6,645 +6,1460 @@
     "_exporter_id": "49865347",
     "_collection_link": "https://go.postman.co/collection/49865347-8ee2ff9d-371e-4331-a6c1-26ff3c25b1b1?source=collection_link"
   },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
   "item": [
     {
-      "name": "1 - Health",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/health",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "health"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "2 - List Athletes (Admin)",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "x-user-id",
-            "value": "{{adminUserId}}"
-          },
-          {
-            "key": "x-role",
-            "value": "{{adminRole}}"
-          }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/athletes",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "athletes"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "3 - Create Athlete",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "x-user-id",
-            "value": "{{adminUserId}}"
-          },
-          {
-            "key": "x-role",
-            "value": "{{adminRole}}"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"athleteId\": \"athlete-2\",\n  \"userId\": \"athlete-user-2\",\n  \"firstName\": \"Lea\",\n  \"lastName\": \"Schmidt\",\n  \"birthDate\": \"2000-03-20T00:00:00.000Z\",\n  \"gender\": \"female\",\n  \"weightKg\": 62,\n  \"heightCm\": 170,\n  \"trainingLevel\": \"fortgeschritten\",\n  \"sports\": [\"running\", \"cycling\"]\n}"
-        },
-        "url": {
-          "raw": "{{baseUrl}}/athletes",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "athletes"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "4 - Create Session",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "x-user-id",
-            "value": "{{adminUserId}}"
-          },
-          {
-            "key": "x-role",
-            "value": "{{adminRole}}"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"athleteId\": \"{{athleteId}}\",\n  \"sport\": \"running\",\n  \"sensorTypes\": [\"heart-rate\", \"gps\"]\n}"
-        },
-        "url": {
-          "raw": "{{baseUrl}}/sessions",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "sessions"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "5 - Batch Sensor Events",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "x-user-id",
-            "value": "{{adminUserId}}"
-          },
-          {
-            "key": "x-role",
-            "value": "{{adminRole}}"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"events\": [\n    {\n      \"sessionId\": \"{{sessionId}}\",\n      \"timestamp\": \"2026-03-09T10:00:00.000Z\",\n      \"sensorType\": \"heart-rate\",\n      \"heartRate\": 142,\n      \"speed\": 3.8,\n      \"distanceDelta\": 38\n    },\n    {\n      \"sessionId\": \"{{sessionId}}\",\n      \"timestamp\": \"2026-03-09T10:00:10.000Z\",\n      \"sensorType\": \"heart-rate\",\n      \"heartRate\": 146,\n      \"speed\": 3.9,\n      \"distanceDelta\": 39\n    }\n  ]\n}"
-        },
-        "url": {
-          "raw": "{{baseUrl}}/sensor-events/batch",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "sensor-events",
-            "batch"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "6 - Recent Sensor Events",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "x-user-id",
-            "value": "{{adminUserId}}"
-          },
-          {
-            "key": "x-role",
-            "value": "{{adminRole}}"
-          }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/athletes/{{athleteId}}/sensor-events/recent?seconds=3600",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "athletes",
-            "{{athleteId}}",
-            "sensor-events",
-            "recent"
-          ],
-          "query": [
-            {
-              "key": "seconds",
-              "value": "3600"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "7 - Avg Heart Rate",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "x-user-id",
-            "value": "{{adminUserId}}"
-          },
-          {
-            "key": "x-role",
-            "value": "{{adminRole}}"
-          }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/analytics/athletes/{{athleteId}}/average-heart-rate?from=2026-03-09T09:00:00.000Z&to=2026-03-09T11:00:00.000Z",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "analytics",
-            "athletes",
-            "{{athleteId}}",
-            "average-heart-rate"
-          ],
-          "query": [
-            {
-              "key": "from",
-              "value": "2026-03-09T09:00:00.000Z"
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "auth": {
+              "type": "noauth"
             },
-            {
-              "key": "to",
-              "value": "2026-03-09T11:00:00.000Z"
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
             }
-          ]
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "8 - Session Summary",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "x-user-id",
-            "value": "{{adminUserId}}"
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST /auth/register",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"new.user@sport.local\",\n  \"password\": \"newuser123\",\n  \"role\": \"athlete\",\n  \"name\": \"New User\",\n  \"firstName\": \"New\",\n  \"lastName\": \"User\",\n  \"sports\": [\"running\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
           },
-          {
-            "key": "x-role",
-            "value": "{{adminRole}}"
-          }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/analytics/sessions/{{sessionId}}/summary",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "analytics",
-            "sessions",
-            "{{sessionId}}",
-            "summary"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "9 - Athlete History",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "x-user-id",
-            "value": "{{adminUserId}}"
-          },
-          {
-            "key": "x-role",
-            "value": "{{adminRole}}"
-          }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/analytics/athletes/{{athleteId}}/history",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "analytics",
-            "athletes",
-            "{{athleteId}}",
-            "history"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "10 - Calculate Load Zones",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "x-user-id",
-            "value": "{{adminUserId}}"
-          },
-          {
-            "key": "x-role",
-            "value": "{{adminRole}}"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"maxHeartRate\": 196,\n  \"persist\": true\n}"
+          "response": []
         },
-        "url": {
-          "raw": "{{baseUrl}}/analytics/athletes/{{athleteId}}/load-zones/calculate",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "analytics",
-            "athletes",
-            "{{athleteId}}",
-            "load-zones",
-            "calculate"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "11 - Athlete Access Guard (Self)",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "x-user-id",
-            "value": "{{athleteUserId}}"
-          },
-          {
-            "key": "x-role",
-            "value": "{{athleteRole}}"
-          }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/athletes/{{athleteId}}",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "athletes",
-            "{{athleteId}}"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "compareAthletes",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "x-user-id",
-            "value": "{{adminUserId}}"
-          },
-          {
-            "key": "x-role",
-            "value": "{{adminRole}}"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"athleteIds\" : [\"athlete-1\", \"athlete-2\"]\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
+        {
+          "name": "POST /auth/login (Admin -> Set authToken)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "const token = (response && response.auth && response.auth.token) || response.access_token || response.token;",
+                  "",
+                  "pm.test('Auth token vorhanden', function () {",
+                  "  pm.expect(token).to.be.a('string').and.not.empty;",
+                  "});",
+                  "",
+                  "if (token) {",
+                  "  pm.collectionVariables.set('authToken', token);",
+                  "  console.log('Collection authToken gesetzt:', token);",
+                  "}",
+                  "",
+                  "if (response && response.user && response.user.athleteId) {",
+                  "  pm.collectionVariables.set('athleteId', response.user.athleteId);",
+                  "}",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
             }
-          }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
         },
-        "url": {
-          "raw": "{{baseUrl}}/analytics/compare-athletes",
-          "host": [
-            "{{baseUrl}}"
+        {
+          "name": "POST /auth/login (Trainer -> Set authToken)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const response = pm.response.json();",
+                  "const token = (response && response.auth && response.auth.token) || response.access_token || response.token;",
+                  "if (token) {",
+                  "  pm.collectionVariables.set('authToken', token);",
+                  "  console.log('Collection authToken gesetzt (trainer):', token);",
+                  "}",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
           ],
-          "path": [
-            "analytics",
-            "compare-athletes"
-          ]
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{trainerEmail}}\",\n  \"password\": \"{{trainerPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /auth/login (Athlete -> Set authToken)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const response = pm.response.json();",
+                  "const token = (response && response.auth && response.auth.token) || response.access_token || response.token;",
+                  "if (token) {",
+                  "  pm.collectionVariables.set('authToken', token);",
+                  "  console.log('Collection authToken gesetzt (athlete):', token);",
+                  "}",
+                  "if (response && response.user && response.user.athleteId) {",
+                  "  pm.collectionVariables.set('athleteId', response.user.athleteId);",
+                  "}",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{athleteEmail}}\",\n  \"password\": \"{{athletePassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /auth/me",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "getAthleteAllTimeStats",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/analytics/athletes/:id/all-time-stats",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "analytics",
-            "athletes",
-            ":id",
-            "all-time-stats"
-          ],
-          "variable": [
-            {
-              "key": "id",
-              "value": ""
+      "name": "Athletes",
+      "item": [
+        {
+          "name": "POST /athletes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"athleteId\": \"athlete-demo\",\n  \"userId\": \"athlete-user-demo\",\n  \"firstName\": \"Lea\",\n  \"lastName\": \"Schmidt\",\n  \"birthDate\": \"2000-03-20T00:00:00.000Z\",\n  \"gender\": \"female\",\n  \"weightKg\": 62,\n  \"heightCm\": 170,\n  \"trainingLevel\": \"intermediate\",\n  \"sports\": [\"running\", \"cycling\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/athletes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "athletes"
+              ]
             }
-          ]
+          },
+          "response": []
+        },
+        {
+          "name": "GET /athletes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/athletes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "athletes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /athletes/:athleteId",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/athletes/{{athleteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "athletes",
+                "{{athleteId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /athletes/:athleteId",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"trainingLevel\": \"advanced\",\n  \"sports\": [\"running\", \"cycling\", \"swimming\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/athletes/{{athleteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "athletes",
+                "{{athleteId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /athletes/:athleteId",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/athletes/{{athleteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "athletes",
+                "{{athleteId}}"
+              ]
+            }
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "getAverageMetricsPerSession",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/analytics/athletes/:athlete-id/avg-per-session",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "analytics",
-            "athletes",
-            ":athlete-id",
-            "avg-per-session"
-          ],
-          "variable": [
+      "name": "Sessions",
+      "item": [
+        {
+          "name": "POST /sessions",
+          "event": [
             {
-              "key": "athlete-id",
-              "value": ""
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  const res = pm.response.json();",
+                  "  if (res && res.sessionId) {",
+                  "    pm.collectionVariables.set('sessionId', res.sessionId);",
+                  "    console.log('sessionId gesetzt:', res.sessionId);",
+                  "  }",
+                  "}",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
             }
-          ]
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"athleteId\": \"{{athleteId}}\",\n  \"sport\": \"running\",\n  \"sensorTypes\": [\"heart-rate\", \"gps\", \"power\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sessions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /sessions/:sessionId",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sessions/{{sessionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                "{{sessionId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /athletes/:athleteId/sessions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/athletes/{{athleteId}}/sessions?limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "athletes",
+                "{{athleteId}}",
+                "sessions"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /sessions/:sessionId/finish",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"endAt\": \"{{toIso}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sessions/{{sessionId}}/finish",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                "{{sessionId}}",
+                "finish"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /sessions/:sessionId/notes",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Session lief stabil, Pulsbereich passend.\",\n  \"append\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sessions/{{sessionId}}/notes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                "{{sessionId}}",
+                "notes"
+              ]
+            }
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "getAthletePerformanceMetrics",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/analytics/athletes/:athlete-id/performance-metrics",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "analytics",
-            "athletes",
-            ":athlete-id",
-            "performance-metrics"
-          ],
-          "variable": [
-            {
-              "key": "athlete-id",
-              "value": ""
+      "name": "Sensor Events",
+      "item": [
+        {
+          "name": "POST /sensor-events",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"{{sessionId}}\",\n  \"timestamp\": \"{{fromIso}}\",\n  \"sensorType\": \"heart-rate\",\n  \"heartRate\": 150,\n  \"metrics\": {\n    \"heartRate\": 150\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sensor-events",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sensor-events"
+              ]
             }
-          ]
+          },
+          "response": []
+        },
+        {
+          "name": "POST /sensor-events/batch",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"sessionId\": \"{{sessionId}}\",\n      \"timestamp\": \"2026-03-09T10:00:00.000Z\",\n      \"sensorType\": \"heart-rate\",\n      \"heartRate\": 142,\n      \"speed\": 3.8,\n      \"distanceDelta\": 38\n    },\n    {\n      \"sessionId\": \"{{sessionId}}\",\n      \"timestamp\": \"2026-03-09T10:00:10.000Z\",\n      \"sensorType\": \"gps\",\n      \"metrics\": {\n        \"speed\": 3.9,\n        \"distanceDelta\": 39,\n        \"lat\": 48.1372,\n        \"lon\": 11.5761\n      }\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sensor-events/batch",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sensor-events",
+                "batch"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /sensor-events/simulate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"{{sessionId}}\",\n  \"timestamp\": \"{{toIso}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sensor-events/simulate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sensor-events",
+                "simulate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /athletes/:athleteId/sensor-events/recent",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/athletes/{{athleteId}}/sensor-events/recent?seconds=3600&limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "athletes",
+                "{{athleteId}}",
+                "sensor-events",
+                "recent"
+              ],
+              "query": [
+                {
+                  "key": "seconds",
+                  "value": "3600"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            }
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "getSportStatistics",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/analytics/athletes/:athlete-id/sport-stats",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "analytics",
-            "athletes",
-            ":athlete-id",
-            "sport-stats"
-          ],
-          "variable": [
-            {
-              "key": "athlete-id",
-              "value": ""
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "GET /analytics/athletes/:athleteId/average-heart-rate",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/athletes/{{athleteId}}/average-heart-rate?from={{fromIso}}&to={{toIso}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "athletes",
+                "{{athleteId}}",
+                "average-heart-rate"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "{{fromIso}}"
+                },
+                {
+                  "key": "to",
+                  "value": "{{toIso}}"
+                }
+              ]
             }
-          ]
+          },
+          "response": []
+        },
+        {
+          "name": "GET /analytics/sessions/:sessionId/summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/sessions/{{sessionId}}/summary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "sessions",
+                "{{sessionId}}",
+                "summary"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /analytics/athletes/:athleteId/history",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/athletes/{{athleteId}}/history?from={{fromIso}}&to={{toIso}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "athletes",
+                "{{athleteId}}",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "{{fromIso}}"
+                },
+                {
+                  "key": "to",
+                  "value": "{{toIso}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /analytics/athletes/:athleteId/load-zones/calculate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"maxHeartRate\": 196,\n  \"persist\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/analytics/athletes/{{athleteId}}/load-zones/calculate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "athletes",
+                "{{athleteId}}",
+                "load-zones",
+                "calculate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /analytics/athletes/:athleteId/performance-metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/athletes/{{athleteId}}/performance-metrics?from={{fromIso}}&to={{toIso}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "athletes",
+                "{{athleteId}}",
+                "performance-metrics"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "{{fromIso}}"
+                },
+                {
+                  "key": "to",
+                  "value": "{{toIso}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /analytics/athletes/:athleteId/all-time-stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/athletes/{{athleteId}}/all-time-stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "athletes",
+                "{{athleteId}}",
+                "all-time-stats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /analytics/athletes/:athleteId/avg-per-session",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/athletes/{{athleteId}}/avg-per-session?limit=20&sport=running",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "athletes",
+                "{{athleteId}}",
+                "avg-per-session"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "sport",
+                  "value": "running"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /analytics/athletes/:athleteId/sport-stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/athletes/{{athleteId}}/sport-stats?from={{fromIso}}&to={{toIso}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "athletes",
+                "{{athleteId}}",
+                "sport-stats"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "{{fromIso}}"
+                },
+                {
+                  "key": "to",
+                  "value": "{{toIso}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /analytics/athletes/:athleteId/progress",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/athletes/{{athleteId}}/progress?sport=running&metric=speed&intervalDays=7",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "athletes",
+                "{{athleteId}}",
+                "progress"
+              ],
+              "query": [
+                {
+                  "key": "sport",
+                  "value": "running"
+                },
+                {
+                  "key": "metric",
+                  "value": "speed"
+                },
+                {
+                  "key": "intervalDays",
+                  "value": "7"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /analytics/athletes/:athleteId/history-enhanced",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/athletes/{{athleteId}}/history-enhanced?limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "athletes",
+                "{{athleteId}}",
+                "history-enhanced"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /analytics/sessions/:sessionId/detailed",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/sessions/{{sessionId}}/detailed",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "sessions",
+                "{{sessionId}}",
+                "detailed"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /analytics/sessions/:sessionId/hr-zones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/sessions/{{sessionId}}/hr-zones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "sessions",
+                "{{sessionId}}",
+                "hr-zones"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /analytics/compare-athletes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"athleteIds\": [\"{{athleteId}}\", \"{{secondAthleteId}}\"],\n  \"sport\": \"running\",\n  \"from\": \"{{fromIso}}\",\n  \"to\": \"{{toIso}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/analytics/compare-athletes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "compare-athletes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /analytics/compare-sessions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionIds\": [\"{{sessionId}}\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/analytics/compare-sessions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "compare-sessions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /analytics/live-overview",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"athleteIds\": [\"{{athleteId}}\", \"{{secondAthleteId}}\"],\n  \"lastMinutes\": 15\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/analytics/live-overview",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "live-overview"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /analytics/leaderboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/leaderboard?sport=running&metric=speed&limit=10&from={{fromIso}}&to={{toIso}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "leaderboard"
+              ],
+              "query": [
+                {
+                  "key": "sport",
+                  "value": "running"
+                },
+                {
+                  "key": "metric",
+                  "value": "speed"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "from",
+                  "value": "{{fromIso}}"
+                },
+                {
+                  "key": "to",
+                  "value": "{{toIso}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /analytics/compare-training-levels",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/compare-training-levels?sport=running&from={{fromIso}}&to={{toIso}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "compare-training-levels"
+              ],
+              "query": [
+                {
+                  "key": "sport",
+                  "value": "running"
+                },
+                {
+                  "key": "from",
+                  "value": "{{fromIso}}"
+                },
+                {
+                  "key": "to",
+                  "value": "{{toIso}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /analytics/sessions-with-notes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/sessions-with-notes?athleteId={{athleteId}}&from={{fromIso}}&to={{toIso}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "sessions-with-notes"
+              ],
+              "query": [
+                {
+                  "key": "athleteId",
+                  "value": "{{athleteId}}"
+                },
+                {
+                  "key": "from",
+                  "value": "{{fromIso}}"
+                },
+                {
+                  "key": "to",
+                  "value": "{{toIso}}"
+                }
+              ]
+            }
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "getTrainingHistory",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/analytics/athletes/:athlete-id/history-enhanced",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "analytics",
-            "athletes",
-            ":athlete-id",
-            "history-enhanced"
-          ],
-          "variable": [
-            {
-              "key": "athlete-id",
-              "value": ""
+      "name": "Admin",
+      "item": [
+        {
+          "name": "GET /admin/system-metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/system-metrics?from={{fromIso}}&to={{toIso}}&intervalMinutes=60",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "system-metrics"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "{{fromIso}}"
+                },
+                {
+                  "key": "to",
+                  "value": "{{toIso}}"
+                },
+                {
+                  "key": "intervalMinutes",
+                  "value": "60"
+                }
+              ]
             }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "averageHeartRate",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/analytics/athletes/:athlete-id/average-heart-rate",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "analytics",
-            "athletes",
-            ":athlete-id",
-            "average-heart-rate"
-          ],
-          "variable": [
-            {
-              "key": "athlete-id",
-              "value": ""
+          },
+          "response": []
+        },
+        {
+          "name": "GET /admin/write-performance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/write-performance?from={{fromIso}}&to={{toIso}}&groupByMinutes=60",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "write-performance"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "{{fromIso}}"
+                },
+                {
+                  "key": "to",
+                  "value": "{{toIso}}"
+                },
+                {
+                  "key": "groupByMinutes",
+                  "value": "60"
+                }
+              ]
             }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "sessionSummary",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/analytics/sessions/:session-id/summary",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "analytics",
-            "sessions",
-            ":session-id",
-            "summary"
-          ],
-          "variable": [
-            {
-              "key": "session-id",
-              "value": ""
+          },
+          "response": []
+        },
+        {
+          "name": "GET /admin/audit-logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/audit-logs?from={{fromIso}}&to={{toIso}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "audit-logs"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "{{fromIso}}"
+                },
+                {
+                  "key": "to",
+                  "value": "{{toIso}}"
+                }
+              ]
             }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "getDetailedSessionAnalysis",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/analytics/sessions/:session-id/detailed",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "analytics",
-            "sessions",
-            ":session-id",
-            "detailed"
-          ],
-          "variable": [
-            {
-              "key": "session-id",
-              "value": ""
+          },
+          "response": []
+        },
+        {
+          "name": "GET /admin/sensor-types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/sensor-types?from={{fromIso}}&to={{toIso}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "sensor-types"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "{{fromIso}}"
+                },
+                {
+                  "key": "to",
+                  "value": "{{toIso}}"
+                }
+              ]
             }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "getHeartRateZoneAnalysis",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/analytics/sessions/:session-id/hr-zones",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "analytics",
-            "sessions",
-            ":session-id",
-            "hr-zones"
-          ],
-          "variable": [
-            {
-              "key": "session-id",
-              "value": ""
+          },
+          "response": []
+        },
+        {
+          "name": "GET /admin/data-volume-by-sport",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/data-volume-by-sport?from={{fromIso}}&to={{toIso}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "data-volume-by-sport"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "{{fromIso}}"
+                },
+                {
+                  "key": "to",
+                  "value": "{{toIso}}"
+                }
+              ]
             }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "getProgressOverTime",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/analytics/athletes/:athlete-id/progress",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "analytics",
-            "athletes",
-            ":athlete-id",
-            "progress"
-          ],
-          "variable": [
-            {
-              "key": "athlete-id",
-              "value": ""
+          },
+          "response": []
+        },
+        {
+          "name": "GET /admin/users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ]
             }
-          ]
+          },
+          "response": []
+        },
+        {
+          "name": "POST /admin/users",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"coach.new@sport.local\",\n  \"password\": \"coach123\",\n  \"role\": \"trainer\",\n  \"name\": \"Coach New\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /admin/users/:userId/role",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"athlete\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{userId}}/role",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{userId}}",
+                "role"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /admin/sensor-catalog",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/sensor-catalog",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "sensor-catalog"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /admin/sensor-types",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sensorType\": \"cadence\",\n  \"displayName\": \"Kadenz\",\n  \"unit\": \"rpm\",\n  \"description\": \"Trittfrequenz\",\n  \"generatorType\": \"custom\",\n  \"generatorConfig\": {\n    \"metricKey\": \"cadence\",\n    \"base\": 85,\n    \"amplitude\": 10,\n    \"noise\": 4,\n    \"min\": 50,\n    \"max\": 130,\n    \"frequencyDivisor\": 9\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/sensor-types",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "sensor-types"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /admin/trainer-assignments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/trainer-assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "trainer-assignments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /admin/trainers/:trainerId/athletes",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"add\",\n  \"athleteId\": \"{{athleteId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/trainers/{{trainerId}}/athletes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "trainers",
+                "{{trainerId}}",
+                "athletes"
+              ]
+            }
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
     }
   ],
   "variable": [
@@ -653,28 +1468,60 @@
       "value": "http://localhost:3000/api"
     },
     {
-      "key": "adminUserId",
-      "value": "admin-1"
+      "key": "authToken",
+      "value": ""
     },
     {
-      "key": "adminRole",
-      "value": "admin"
+      "key": "adminEmail",
+      "value": "admin@sport.local"
     },
     {
-      "key": "athleteUserId",
-      "value": "athlete-user-1"
+      "key": "adminPassword",
+      "value": "admin123"
     },
     {
-      "key": "athleteRole",
-      "value": "athlete"
+      "key": "trainerEmail",
+      "value": "trainer@sport.local"
+    },
+    {
+      "key": "trainerPassword",
+      "value": "trainer123"
+    },
+    {
+      "key": "athleteEmail",
+      "value": "alex@sport.local"
+    },
+    {
+      "key": "athletePassword",
+      "value": "athlete123"
     },
     {
       "key": "athleteId",
       "value": "athlete-1"
     },
     {
+      "key": "secondAthleteId",
+      "value": "athlete-2"
+    },
+    {
       "key": "sessionId",
-      "value": "session-1"
+      "value": "session-athlete-1-running-1"
+    },
+    {
+      "key": "trainerId",
+      "value": "trainer-1"
+    },
+    {
+      "key": "userId",
+      "value": "admin-1"
+    },
+    {
+      "key": "fromIso",
+      "value": "2026-02-01T00:00:00.000Z"
+    },
+    {
+      "key": "toIso",
+      "value": "2026-03-20T23:59:59.000Z"
     }
   ]
 }

@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/
 import { createHash } from 'crypto';
 import { MongoService } from '../mongo.service';
 import { RequestUser, USER_ROLES } from '../common/auth/auth.types';
+import { issueAuthToken } from '../common/auth/auth.utils';
 import { createId } from '../common/utils/id';
 import { ensureString, ensureStringArray } from '../common/utils/parse';
 
@@ -101,7 +102,7 @@ export class AuthService {
     }
 
     return {
-      auth: { userId, role },
+      auth: { userId, role, token: issueAuthToken({ userId, role }) },
       user: this.toPublicUser(userDoc)
     };
   }
@@ -116,7 +117,7 @@ export class AuthService {
     }
 
     return {
-      auth: { userId: user.userId, role: user.role },
+      auth: { userId: user.userId, role: user.role, token: issueAuthToken({ userId: user.userId, role: user.role }) },
       user: this.toPublicUser(user)
     };
   }
@@ -128,7 +129,7 @@ export class AuthService {
     }
 
     return {
-      auth: { userId: user.userId, role: user.role },
+      auth: { userId: user.userId, role: user.role, token: issueAuthToken({ userId: user.userId, role: user.role }) },
       user: this.toPublicUser(user)
     };
   }

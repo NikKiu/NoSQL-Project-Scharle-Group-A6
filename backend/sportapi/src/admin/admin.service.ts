@@ -11,6 +11,21 @@ import { ensureString } from '../common/utils/parse';
 export class AdminService {
   constructor(private readonly mongoService: MongoService) {}
 
+  private async writeAuditLog(
+    user: RequestUser,
+    action: string,
+    details?: Record<string, any>
+  ): Promise<void> {
+    await this.mongoService.getDb().collection('audit_logs').insertOne({
+      auditId: createId('audit'),
+      timestamp: new Date(),
+      userId: user.userId,
+      userRole: user.role,
+      action,
+      details: details ?? {}
+    });
+  }
+
   private toPublicUser(user: any) {
     if (!user) return null;
 
@@ -36,7 +51,9 @@ export class AdminService {
     const from = parseDate(query.from, 'from');
     const to = parseDate(query.to, 'to');
     const intervalMinutes = Number(query.intervalMinutes) || 5;
-    return AggPipeline.getSystemMetrics(this.mongoService.getDb(), from, to, intervalMinutes);
+    const result = await AggPipeline.getSystemMetrics(this.mongoService.getDb(), from, to, intervalMinutes);
+    await this.writeAuditLog(user, 'admin.systemMetrics.read', { from, to, intervalMinutes, rows: result.length });
+    return result;
   }
 
   /** NF1, NF3, F14 – US 8: Schreib-Performance überwachen */
@@ -45,7 +62,9 @@ export class AdminService {
     const from = parseDate(query.from, 'from');
     const to = parseDate(query.to, 'to');
     const groupByMinutes = Number(query.groupByMinutes) || 1;
-    return AggPipeline.getWritePerformanceMetrics(this.mongoService.getDb(), from, to, groupByMinutes);
+    const result = await AggPipeline.getWritePerformanceMetrics(this.mongoService.getDb(), from, to, groupByMinutes);
+    await this.writeAuditLog(user, 'admin.writePerformance.read', { from, to, groupByMinutes, rows: result.length });
+    return result;
   }
 
   /** F15, F23, NF7 – US 11: Audit-Logs einsehen */
@@ -53,7 +72,9 @@ export class AdminService {
     this.requireAdmin(user);
     const from = parseDate(query.from, 'from');
     const to = parseDate(query.to, 'to');
-    return AggPipeline.getAuditLogSummary(this.mongoService.getDb(), from, to, query.action);
+    const result = await AggPipeline.getAuditLogSummary(this.mongoService.getDb(), from, to, query.action);
+    await this.writeAuditLog(user, 'admin.auditLogs.read', { from, to, action: query.action ?? null, rows: result.length });
+    return result;
   }
 
   /** F13, F16 – US 9, US 12: Sensortypen-Statistiken */
@@ -61,7 +82,9 @@ export class AdminService {
     this.requireAdmin(user);
     const from = parseOptionalDate(query.from, 'from');
     const to = parseOptionalDate(query.to, 'to');
-    return AggPipeline.getSensorTypeUsageStats(this.mongoService.getDb(), from, to);
+    const result = await AggPipeline.getSensorTypeUsageStats(this.mongoService.getDb(), from, to);
+    await this.writeAuditLog(user, 'admin.sensorTypeStats.read', { from: from ?? null, to: to ?? null, rows: result.length });
+    return result;
   }
 
   /** F16 – US 12: Datenvolumen pro Sportart */
@@ -69,7 +92,9 @@ export class AdminService {
     this.requireAdmin(user);
     const from = parseOptionalDate(query.from, 'from');
     const to = parseOptionalDate(query.to, 'to');
-    return AggPipeline.getDataVolumePerSport(this.mongoService.getDb(), from, to);
+    const result = await AggPipeline.getDataVolumePerSport(this.mongoService.getDb(), from, to);
+    await this.writeAuditLog(user, 'admin.dataVolume.read', { from: from ?? null, to: to ?? null, rows: result.length });
+    return result;
   }
 
   /** F12, F23, NF7 – US 10: Nutzerverwaltung */
@@ -77,17 +102,17 @@ export class AdminService {
     this.requireAdmin(user);
     const filter: any = {};
     if (query.role) filter.role = query.role;
-    return this.mongoService
+    const result = await this.mongoService
       .getDb()
       .collection('users')
       .find(filter, { projection: { _id: 0, passwordHash: 0 } })
       .sort({ createdAt: -1 })
       .toArray();
+    await this.writeAuditLog(user, 'admin.users.read', { role: query.role ?? null, rows: result.length });
+    return result;
   }
 
-  async getSensorCatalog(user: RequestUser) {
-    this.requireAdmin(user);
-
+  async getSensorCatalog() {
     return this.mongoService
       .getDb()
       .collection('sensor_types')
@@ -156,6 +181,11 @@ export class AdminService {
     }
 
     const { passwordHash: _ignored, ...publicUser } = createdUser as any;
+    await this.writeAuditLog(user, 'admin.users.create', {
+      createdUserId: createdUser.userId,
+      role,
+      email
+    });
     return { created: true, user: publicUser };
   }
 
@@ -224,6 +254,12 @@ export class AdminService {
 
     const updatedUser = await users.findOne({ userId }, { projection: { _id: 0, passwordHash: 0 } });
 
+    await this.writeAuditLog(user, 'admin.users.role.update', {
+      userId,
+      previousRole: existingUser.role,
+      nextRole
+    });
+
     return {
       updated: true,
       user: this.toPublicUser(updatedUser)
@@ -276,7 +312,12 @@ export class AdminService {
       { upsert: true }
     );
 
-    return this.mongoService.getDb().collection('sensor_types').findOne({ sensorType }, { projection: { _id: 0 } });
+    const result = await this.mongoService.getDb().collection('sensor_types').findOne({ sensorType }, { projection: { _id: 0 } });
+    await this.writeAuditLog(user, 'admin.sensorTypes.upsert', {
+      sensorType,
+      generatorType: generatorType ?? null
+    });
+    return result;
   }
 
   async getTrainerAssignments(user: RequestUser) {
@@ -294,7 +335,7 @@ export class AdminService {
 
     const athletesById = new Map(athletes.map((athlete: any) => [athlete.athleteId, athlete]));
 
-    return trainers.map((trainer: any) => {
+    const result = trainers.map((trainer: any) => {
       const assignedIds = Array.isArray(trainer.trainerAthleteIds) ? trainer.trainerAthleteIds : [];
       return {
         trainerId: trainer.userId,
@@ -315,6 +356,12 @@ export class AdminService {
           .filter(Boolean)
       };
     });
+
+    await this.writeAuditLog(user, 'admin.trainerAssignments.read', {
+      trainerCount: result.length,
+      athleteCount: athletes.length
+    });
+    return result;
   }
 
   async updateTrainerAthleteAssignment(trainerId: string, body: any, user: RequestUser) {
@@ -354,6 +401,13 @@ export class AdminService {
         }
       }
     );
+
+    await this.writeAuditLog(user, 'admin.trainerAssignments.update', {
+      trainerId,
+      athleteId,
+      action,
+      resultingAssignments: nextIds.length
+    });
 
     return {
       updated: true,

@@ -5,6 +5,7 @@
 - Modul-Base-Path: `/analytics`
 - Auth: Bearer Token erforderlich
 - Rollen: Sportler, Trainer, Admin je nach Ressourcenzugriff
+- Ressourcenzugriff wird serverseitig über Athlet-/Session-Rechte geprüft (eigene Daten, zugewiesene Trainerdaten, Admin)
 
 ## Endpunkte
 - `GET /api/analytics/athletes/:athleteId/average-heart-rate` - Durchschnittspuls im Zeitraum (`from`, `to`)

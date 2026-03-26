@@ -3,6 +3,7 @@
 ## Scope
 - Globaler Prefix: `/api`
 - Modul-Base-Path: `/auth`
+- Auth-Verfahren: signierter Bearer-Token (`Authorization: Bearer <token>`)
 
 ## Endpunkte
 - `POST /api/auth/register` - Neuen Nutzer registrieren (öffentlich)
@@ -12,4 +13,6 @@
 ## Hinweise zu Payloads
 - `POST /register`: typischerweise `email`, `password`, `role`, optionale Stammdaten
 - `POST /login`: typischerweise `email`, `password`
+- Erfolgreiche Antworten enthalten `auth.token`, der bei allen geschützten Endpunkten als Bearer-Token gesendet werden muss
+- Für stabile Token-Validierung über Server-Neustarts sollte `AUTH_TOKEN_SECRET` gesetzt werden
 

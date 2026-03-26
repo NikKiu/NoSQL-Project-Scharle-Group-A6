@@ -14,6 +14,24 @@ export class AthletesService {
     return this.mongoService.getDb().collection<AthleteDocument>('athletes');
   }
 
+  private usersCollection() {
+    return this.mongoService.getDb().collection('users');
+  }
+
+  private async ensureTrainerAssignment(athleteId: string, user: RequestUser): Promise<void> {
+    if (user.role !== 'trainer') return;
+
+    const trainer = await this.usersCollection().findOne(
+      { userId: user.userId, role: 'trainer' },
+      { projection: { _id: 0, trainerAthleteIds: 1 } }
+    );
+
+    const assignedIds = Array.isArray(trainer?.trainerAthleteIds) ? trainer.trainerAthleteIds : [];
+    if (!assignedIds.includes(athleteId)) {
+      throw new ForbiddenException('Trainer can only access assigned athletes');
+    }
+  }
+
   private async resolveAthleteForUser(athleteId: string, user: RequestUser): Promise<AthleteDocument> {
     const athlete = await this.collection().findOne({ athleteId });
     if (!athlete) throw new NotFoundException('Athlete not found');
@@ -21,6 +39,8 @@ export class AthletesService {
     if (user.role === 'athlete' && athlete.userId !== user.userId) {
       throw new ForbiddenException('Athletes can only access their own profile');
     }
+
+    await this.ensureTrainerAssignment(athleteId, user);
 
     return athlete;
   }
@@ -69,6 +89,16 @@ export class AthletesService {
     if (user.role === 'athlete') {
       const ownAthlete = await this.collection().findOne({ userId: user.userId });
       return ownAthlete ? [ownAthlete] : [];
+    }
+
+    if (user.role === 'trainer') {
+      const trainer = await this.usersCollection().findOne(
+        { userId: user.userId, role: 'trainer' },
+        { projection: { _id: 0, trainerAthleteIds: 1 } }
+      );
+      const assignedIds = Array.isArray(trainer?.trainerAthleteIds) ? trainer.trainerAthleteIds : [];
+      if (assignedIds.length === 0) return [];
+      return this.collection().find({ athleteId: { $in: assignedIds } }).sort({ createdAt: -1 }).toArray();
     }
 
     const filter: any = {};

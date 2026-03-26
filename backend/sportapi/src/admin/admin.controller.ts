@@ -37,8 +37,8 @@ export class AdminController {
   }
 
   @Get('sensor-catalog')
-  getSensorCatalog(@Req() req: any) {
-    return this.adminService.getSensorCatalog(getRequestUser(req));
+  getSensorCatalog() {
+    return this.adminService.getSensorCatalog();
   }
 
   @Get('trainer-assignments')
