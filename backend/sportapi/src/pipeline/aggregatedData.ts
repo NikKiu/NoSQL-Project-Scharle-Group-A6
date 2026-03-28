@@ -1,15 +1,5 @@
 import { Db, Document } from 'mongodb';
 
-/**
- * Aggregation Pipelines für Sport-Performance Tracking System
- * Basierend auf den Anforderungen F10, NF4, NF9, NF10
- */
-
-/**
- * F10, NF4: Sportlerspezifische Auswertungen - Durchschnittspuls über einen definierten Zeitraum
- * US 6 & 7: Maximalgeschwindigkeit sehen / Trainingshistorie
- * fromDate / toDate optional – ohne Angabe werden alle Events berücksichtigt.
- */
 export async function getAthletePerformanceMetrics(
   db: Db,
   athleteId: string,
@@ -79,11 +69,6 @@ export async function getAthletePerformanceMetrics(
   };
 }
 
-/**
- * NF4: All-Time Gesamtstatistik eines Sportlers – kein Datumsbereich nötig.
- * Ideal für einen schnellen Überblick in Postman.
- * US 7: Trainingshistorie einsehen
- */
 export async function getAthleteAllTimeStats(db: Db, athleteId: string) {
   const pipeline: Document[] = [
     { $match: { athleteId } },
@@ -129,10 +114,6 @@ export async function getAthleteAllTimeStats(db: Db, athleteId: string) {
   };
 }
 
-/**
- * NF4, NF9: Durchschnittswerte pro Session – zeigt Entwicklung über die Trainingseinheiten.
- * US 7: Trainingshistorie einsehen
- */
 export async function getAverageMetricsPerSession(
   db: Db,
   athleteId: string,
@@ -204,11 +185,6 @@ export async function getAverageMetricsPerSession(
   return db.collection('sensor_events').aggregate(pipeline).toArray();
 }
 
-/**
- * F10, NF4: Trainingshistorie mit Durchschnittskennzahlen pro Session
- * US 7: Trainingshistorie einsehen können (Durchschnittspuls, Geschwindigkeit, etc.)
- * US 16: Trainer - Einsicht in historische Trainingsdaten
- */
 export async function getTrainingHistory(
   db: Db,
   athleteId: string,
@@ -261,11 +237,6 @@ export async function getTrainingHistory(
   return db.collection('training_sessions').aggregate(pipeline).toArray();
 }
 
-/**
- * F17, F22, NF10: Vergleiche zwischen Sportlern anhand frei wählbarer Metriken
- * US 13: Trainer - Zugriff auf durchschnittliche Leistungsdaten
- * US 19: Trainer - Vergleiche zwischen Sportlern durchführen
- */
 export async function compareAthletes(
   db: Db,
   athleteIds: string[],
@@ -355,11 +326,6 @@ export async function compareAthletes(
   return db.collection('sensor_events').aggregate(pipeline).toArray();
 }
 
-/**
- * F10, NF4: Sportartspezifische Auswertungen – korrekte Aggregation via $unwind.
- * US 5: Unterschiedliche Sportarten verwalten und dokumentieren.
- * Früher: Mean-of-Means-Problem durch verschachtelte $avg im $group → jetzt behoben.
- */
 export async function getSportStatistics(
   db: Db,
   athleteId: string,
@@ -420,11 +386,6 @@ export async function getSportStatistics(
   return db.collection('training_sessions').aggregate(pipeline).toArray();
 }
 
-/**
- * F14, F16: Administrator - Überwachung der Daten-Pipelines (Schreibrate, Latenz)
- * US 8: Administrator - Schreibrate & Latenz überwachen
- * NF1, NF3: Hohe Schreiblast verarbeiten und Time-Series optimieren
- */
 export async function getSystemMetrics(
   db: Db,
   fromDate: Date,
@@ -480,10 +441,6 @@ export async function getSystemMetrics(
   return db.collection('sensor_events').aggregate(pipeline).toArray();
 }
 
-/**
- * F10, F17: Trainer - Durchschnittliche Leistungsdaten über mehrere Sessions
- * US 17: Trainer - Leistungswerte über mehrere Trainingseinheiten vergleichen
- */
 export async function getSessionComparison(
   db: Db,
   sessionIds: string[]
@@ -564,11 +521,6 @@ export async function getSessionComparison(
   return db.collection('sensor_events').aggregate(pipeline).toArray();
 }
 
-/**
- * F10: Herzfrequenz-Zonen Analyse (Belastungszonen)
- * Zeigt Anzahl der Messwerte in jeder Herzfrequenz-Zone.
- * Fix: $bucket._id = UNTERE Grenze → Zone-Labels waren um eine Zone verschoben.
- */
 export async function getHeartRateZoneAnalysis(
   db: Db,
   sessionId: string,
@@ -653,10 +605,6 @@ export async function getHeartRateZoneAnalysis(
   return db.collection('sensor_events').aggregate(pipeline).toArray();
 }
 
-/**
- * F16: Administrator - Datenvolumen pro Sportart analysieren
- * US 12: Administrator - Vordefinierte Analyseabfragen ausführen
- */
 export async function getDataVolumePerSport(
   db: Db,
   fromDate?: Date,
@@ -707,10 +655,6 @@ export async function getDataVolumePerSport(
   return db.collection('training_sessions').aggregate(pipeline).toArray();
 }
 
-/**
- * F10: Fortschrittsverfolgung - Vergleich von Metriken über Zeit
- * US 6 & 7: Leistungsentwicklung verfolgen
- */
 export async function getProgressOverTime(
   db: Db,
   athleteId: string,
@@ -793,11 +737,6 @@ export async function getProgressOverTime(
   return db.collection('training_sessions').aggregate(pipeline).toArray();
 }
 
-/**
- * F17, NF10: Trainer - Echtzeit-Leistungsübersicht mehrerer Sportler
- * US 14: Echtzeitdaten während des Trainings sehen
- * NF2: Echtzeit-/Nahe-Echtzeit-Abfragen
- */
 export async function getLiveTrainingOverview(
   db: Db,
   athleteIds: string[],
@@ -887,11 +826,6 @@ export async function getLiveTrainingOverview(
   return db.collection('sensor_events').aggregate(pipeline).toArray();
 }
 
-/**
- * F15, F23: Administrator - Audit-Logs und rollenbasierte Zugriffskontrolle
- * US 11: Audit-Logs einsehen
- * NF7: Zugriff auf eigene Daten
- */
 export async function getAuditLogSummary(
   db: Db,
   fromDate: Date,
@@ -956,11 +890,6 @@ export async function getAuditLogSummary(
   return db.collection('audit_logs').aggregate(pipeline).toArray();
 }
 
-/**
- * F13, F16: Administrator - Sensortypen- und Sportarten-Übersicht
- * US 9: Neue Sensortypen oder Sportarten hinzufügen
- * US 12: Vordefinierte Analyseabfragen ausführen
- */
 export async function getSensorTypeUsageStats(
   db: Db,
   fromDate?: Date,
@@ -1012,10 +941,6 @@ export async function getSensorTypeUsageStats(
   return db.collection('sensor_events').aggregate(pipeline).toArray();
 }
 
-/**
- * F10: Leistungsvergleich zwischen verschiedenen Trainingslevels
- * US 19: Vergleiche zwischen Sportlern durchführen
- */
 export async function compareTrainingLevels(
   db: Db,
   sport: string,
@@ -1095,10 +1020,6 @@ export async function compareTrainingLevels(
   return db.collection('training_sessions').aggregate(pipeline).toArray();
 }
 
-/**
- * F21: Trainer - Trainingsnotizen mit Kontext
- * US 15: Notizen speichern und durchsuchen
- */
 export async function getSessionsWithNotes(
   db: Db,
   athleteId?: string,
@@ -1171,11 +1092,6 @@ export async function getSessionsWithNotes(
   return db.collection('training_sessions').aggregate(pipeline).toArray();
 }
 
-/**
- * NF1, NF3: Performance-Monitoring - Schreiblast-Analyse
- * US 8: Schreibrate & Latenz überwachen
- * F14: Überwachung der Daten-Pipelines
- */
 export async function getWritePerformanceMetrics(
   db: Db,
   fromDate: Date,
@@ -1242,11 +1158,6 @@ export async function getWritePerformanceMetrics(
   return db.collection('sensor_events').aggregate(pipeline).toArray();
 }
 
-/**
- * F10, NF9: Detaillierte Session-Analyse mit allen Metriken
- * US 3, US 7: Sensordaten in Echtzeit und Trainingshistorie
- * Konsistente Darstellung aller verfügbaren Trainingsmetriken
- */
 export async function getDetailedSessionAnalysis(
   db: Db,
   sessionId: string
@@ -1431,11 +1342,6 @@ export async function getDetailedSessionAnalysis(
   };
 }
 
-/**
- * F10: Leistungsranking für eine Sportart
- * US 19: Vergleiche zwischen Sportlern durchführen
- * NF10: Vergleiche übersichtlich ermöglichen
- */
 export async function getSportLeaderboard(
   db: Db,
   sport: string,

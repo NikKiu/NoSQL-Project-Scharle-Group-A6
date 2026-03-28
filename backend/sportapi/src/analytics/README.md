@@ -20,10 +20,9 @@
 - `GET /api/analytics/athletes/:athleteId/history-enhanced` - Erweiterte Historie (`limit` optional)
 - `GET /api/analytics/sessions/:sessionId/detailed` - Detaillierte Session-Analyse
 - `GET /api/analytics/sessions/:sessionId/hr-zones` - Herzfrequenzzonen pro Session
-- `POST /api/analytics/compare-athletes` - Mehrere Sportler vergleichen (`athleteIds`, optional `sport`, `from`, `to`)
-- `POST /api/analytics/compare-sessions` - Mehrere Sessions vergleichen (`sessionIds`)
+- `POST /api/analytics/compare-athletes` - Mehrere Sportler vergleichen (`athleteIds`, `sport`, optional `from`, `to`)
+- `POST /api/analytics/compare-sessions` - Mehrere Sessions vergleichen (`sessionIds`, nur gleiche `sport`-Werte erlaubt)
 - `POST /api/analytics/live-overview` - Live-Übersicht (`athleteIds`, optional `lastMinutes`)
 - `GET /api/analytics/leaderboard` - Rangliste (`sport`, `metric`, optional `limit`, `from`, `to`)
 - `GET /api/analytics/compare-training-levels` - Vergleich nach Trainingslevel (`sport`, optional `from`, `to`)
 - `GET /api/analytics/sessions-with-notes` - Sessions mit Notizen (`athleteId`, `from`, `to` optional)
-

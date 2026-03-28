@@ -268,7 +268,10 @@ export class AnalyticsService {
       athleteIds.map(id => this.athletesService.getById(id, user))
     );
 
-    const sport = body.sport;
+    const sport = typeof body.sport === 'string' ? body.sport.trim() : '';
+    if (!sport) {
+      throw new BadRequestException('sport is required for athlete comparison');
+    }
     const from = body.from ? parseDate(body.from, 'from') : undefined;
     const to = body.to ? parseDate(body.to, 'to') : undefined;
 
@@ -282,10 +285,24 @@ export class AnalyticsService {
       throw new BadRequestException('sessionIds must be a non-empty array');
     }
 
-    // Verify access to all sessions
-    await Promise.all(
+    // Verify access and collect sessions for sport consistency check.
+    const sessions = await Promise.all(
       sessionIds.map(id => this.sessionsService.getById(id, user))
     );
+
+    const sports = Array.from(
+      new Set(
+        sessions
+          .map(session => String(session.sport ?? '').trim().toLowerCase())
+          .filter(Boolean)
+      )
+    );
+
+    if (sports.length !== 1) {
+      throw new BadRequestException(
+        `Session comparison is only allowed for the same sport. Found: ${sports.join(', ') || 'unknown'}`
+      );
+    }
 
     const db = this.mongoService.getDb();
     return AggPipeline.getSessionComparison(db, sessionIds);
