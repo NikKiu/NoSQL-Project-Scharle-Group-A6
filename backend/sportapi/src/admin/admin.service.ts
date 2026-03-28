@@ -266,16 +266,29 @@ export class AdminService {
     };
   }
 
+  private escapeRegex(value: string): string {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
   async upsertSensorType(body: any, user: RequestUser) {
     this.requireAdmin(user);
 
     const sensorType = ensureString(body.sensorType ?? body.type, 'sensorType');
+    const displayName = body.displayName?.toString().trim() || sensorType;
     const allowedGeneratorTypes = new Set(['heart-rate', 'gps', 'power', 'custom']);
     const rawGeneratorType = body.generatorType?.toString().trim();
     const generatorType = rawGeneratorType && rawGeneratorType.length > 0 ? rawGeneratorType : undefined;
 
     if (generatorType && !allowedGeneratorTypes.has(generatorType)) {
       throw new BadRequestException('generatorType must be one of: heart-rate, gps, power, custom');
+    }
+
+    const displayNameConflict = await this.mongoService.getDb().collection('sensor_types').findOne({
+      sensorType: { $ne: sensorType },
+      displayName: { $regex: `^${this.escapeRegex(displayName)}$`, $options: 'i' }
+    });
+    if (displayNameConflict) {
+      throw new BadRequestException(`displayName is already used by sensorType '${displayNameConflict.sensorType}'`);
     }
 
     const rawConfig = body.generatorConfig;
@@ -298,7 +311,7 @@ export class AdminService {
       {
         $set: {
           sensorType,
-          displayName: body.displayName?.toString().trim() || sensorType,
+          displayName,
           unit: body.unit?.toString().trim() || null,
           description: body.description?.toString().trim() || null,
           generatorType: generatorType ?? null,

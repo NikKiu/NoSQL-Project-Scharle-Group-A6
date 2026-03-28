@@ -285,10 +285,20 @@ export class AnalyticsService {
       throw new BadRequestException('sessionIds must be a non-empty array');
     }
 
-    // Verify access and collect sessions for sport consistency check.
+    // Verify access and collect sessions for validation checks.
     const sessions = await Promise.all(
       sessionIds.map(id => this.sessionsService.getById(id, user))
     );
+
+    const activeSessionIds = sessions
+      .filter(session => String(session.status ?? '').trim().toLowerCase() !== 'finished')
+      .map(session => session.sessionId);
+
+    if (activeSessionIds.length > 0) {
+      throw new BadRequestException(
+        `Only finished sessions can be compared. Active/open sessions: ${activeSessionIds.join(', ')}`
+      );
+    }
 
     const sports = Array.from(
       new Set(
