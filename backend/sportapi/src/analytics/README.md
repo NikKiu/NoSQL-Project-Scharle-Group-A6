@@ -21,7 +21,7 @@
 - `GET /api/analytics/sessions/:sessionId/detailed` - Detaillierte Session-Analyse
 - `GET /api/analytics/sessions/:sessionId/hr-zones` - Herzfrequenzzonen pro Session
 - `POST /api/analytics/compare-athletes` - Mehrere Sportler vergleichen (`athleteIds`, `sport`, optional `from`, `to`)
-- `POST /api/analytics/compare-sessions` - Mehrere Sessions vergleichen (`sessionIds`, nur gleiche `sport`-Werte erlaubt)
+- `POST /api/analytics/compare-sessions` - Mehrere Sessions vergleichen (`sessionIds`), nur wenn alle Sessions abgeschlossen sind (`status=finished`) und denselben `sport` haben
 - `POST /api/analytics/live-overview` - Live-Übersicht (`athleteIds`, optional `lastMinutes`)
 - `GET /api/analytics/leaderboard` - Rangliste (`sport`, `metric`, optional `limit`, `from`, `to`)
 - `GET /api/analytics/compare-training-levels` - Vergleich nach Trainingslevel (`sport`, optional `from`, `to`)
