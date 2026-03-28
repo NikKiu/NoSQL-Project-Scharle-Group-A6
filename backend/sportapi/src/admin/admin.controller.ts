@@ -66,4 +66,3 @@ export class AdminController {
     return this.adminService.updateTrainerAthleteAssignment(trainerId, body, getRequestUser(req));
   }
 }
-

@@ -266,13 +266,21 @@ export class AdminService {
     };
   }
 
+  private normalizeDisplayName(value: string): string {
+    return value
+      .normalize('NFKC')
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, ' ');
+  }
 
   async upsertSensorType(body: any, user: RequestUser) {
     this.requireAdmin(user);
 
     const sensorType = ensureString(body.sensorType ?? body.type, 'sensorType');
-    const displayName = body.displayName?.toString().trim() || sensorType;
-    const normalizedDisplayName = displayName.toLowerCase();
+    const incomingDisplayName = body.displayName ?? body.label;
+    const displayName = incomingDisplayName?.toString().trim() || sensorType;
+    const normalizedDisplayName = this.normalizeDisplayName(displayName);
     const allowedGeneratorTypes = new Set(['heart-rate', 'gps', 'power', 'custom']);
     const rawGeneratorType = body.generatorType?.toString().trim();
     const generatorType = rawGeneratorType && rawGeneratorType.length > 0 ? rawGeneratorType : undefined;
@@ -281,10 +289,24 @@ export class AdminService {
       throw new BadRequestException('generatorType must be one of: heart-rate, gps, power, custom');
     }
 
-    const displayNameConflict = await this.mongoService.getDb().collection('sensor_types').findOne({
-      sensorType: { $ne: sensorType },
-      normalizedDisplayName
+    const existingSensorTypes = await this.mongoService
+      .getDb()
+      .collection('sensor_types')
+      .find(
+        { sensorType: { $ne: sensorType } },
+        { projection: { _id: 0, sensorType: 1, displayName: 1, label: 1, normalizedDisplayName: 1 } }
+      )
+      .toArray();
+
+    const displayNameConflict = existingSensorTypes.find((entry: any) => {
+      const rawExistingName = entry.displayName ?? entry.label ?? entry.sensorType;
+      const existingNormalized = typeof entry.normalizedDisplayName === 'string' && entry.normalizedDisplayName.length > 0
+        ? this.normalizeDisplayName(entry.normalizedDisplayName)
+        : this.normalizeDisplayName(String(rawExistingName ?? ''));
+
+      return existingNormalized === normalizedDisplayName;
     });
+
     if (displayNameConflict) {
       throw new BadRequestException(`displayName is already used by sensorType '${displayNameConflict.sensorType}'`);
     }
