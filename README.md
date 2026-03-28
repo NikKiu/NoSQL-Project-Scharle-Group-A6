@@ -63,6 +63,11 @@ cd backend
 npm install
 ```
 
+```powershell
+cd backend/sportapi
+npm install
+```
+
 ### 2b) API starten
 
 Im Ordner `backend/sportapi`:
@@ -116,6 +121,7 @@ npm install
 
 # Terminal 3 — API starten (inkl. Seed)
 cd backend/sportapi
+npm install
 npm run start:dev
 
 # Terminal 4 — Frontend
@@ -187,6 +193,12 @@ NoSQL-Project-Scharle-Group-A6/
 
 ## API-Übersicht
 
+### Health Check
+
+| Methode | Pfad          | Beschreibung       |
+|---------|---------------|--------------------|
+| `GET`   | `/api/health` | Status der API     |
+
 ### Authentifizierung
 
 | Methode | Pfad                 | Beschreibung       |
@@ -197,25 +209,23 @@ NoSQL-Project-Scharle-Group-A6/
 
 ### Athleten
 
-| Methode  | Pfad                                     | Beschreibung            |
-|----------|------------------------------------------|-------------------------|
-| `GET`    | `/api/athletes`                          | Alle Athleten           |
-| `POST`   | `/api/athletes`                          | Neues Athletenprofil    |
-| `GET`    | `/api/athletes/:id`                      | Profil abrufen          |
-| `PATCH`  | `/api/athletes/:id`                      | Profil aktualisieren    |
-| `DELETE` | `/api/athletes/:id`                      | Profil löschen          |
-| `GET`    | `/api/athletes/:id/sessions`             | Sessions eines Athleten |
-| `GET`    | `/api/athletes/:id/sensor-events/recent` | Letzte Sensor-Events    |
+| Methode  | Pfad                       | Beschreibung                   |
+|----------|----------------------------|--------------------------------|
+| `GET`    | `/api/athletes`            | Alle Athleten (rollenabhängig) |
+| `POST`   | `/api/athletes`            | Neues Athletenprofil           |
+| `GET`    | `/api/athletes/:athleteId` | Profil abrufen                 |
+| `PATCH`  | `/api/athletes/:athleteId` | Profil aktualisieren           |
+| `DELETE` | `/api/athletes/:athleteId` | Profil löschen                 |
 
-### Sessions
+### Sessions & Training
 
-| Methode | Pfad                                | Beschreibung            |
-|---------|-------------------------------------|-------------------------|
-| `POST`  | `/api/sessions`                     | Training starten        |
-| `GET`   | `/api/sessions/:sessionId`          | Session abrufen         |
-| `PATCH` | `/api/sessions/:sessionId/finish`   | Training beenden        |
-| `PATCH` | `/api/sessions/:sessionId/notes`    | Notizen aktualisieren   |
-| `GET`   | `/api/athletes/:athleteId/sessions` | Sessions eines Athleten |
+| Methode | Pfad                                | Beschreibung                      |
+|---------|-------------------------------------|-----------------------------------| 
+| `POST`  | `/api/sessions`                     | Training starten                  |
+| `GET`   | `/api/sessions/:sessionId`          | Session abrufen                   |
+| `PATCH` | `/api/sessions/:sessionId/finish`   | Training beenden                  |
+| `PATCH` | `/api/sessions/:sessionId/notes`    | Notizen aktualisieren             |
+| `GET`   | `/api/athletes/:athleteId/sessions` | Sessions eines Athleten           |
 
 ### Sensor-Events
 
@@ -226,44 +236,45 @@ NoSQL-Project-Scharle-Group-A6/
 | `POST`  | `/api/sensor-events/simulate`                   | Simulierte Events für Training      |
 | `GET`   | `/api/athletes/:athleteId/sensor-events/recent` | Letzte Sensor-Events eines Athleten |
 
-### Analytics
+### Analytics & Auswertungen
 
-| Methode | Pfad                                                      | Beschreibung                             |
-|---------|-----------------------------------------------------------|------------------------------------------|
-| `GET`   | `/api/analytics/athletes/:athleteId/all-time-stats`       | Gesamtstatistik                          |
-| `GET`   | `/api/analytics/athletes/:athleteId/history-enhanced`     | Trainingshistorie mit Details            |
-| `GET`   | `/api/analytics/athletes/:athleteId/avg-per-session`      | Ø-Werte je Session                       |
-| `GET`   | `/api/analytics/athletes/:athleteId/sport-stats`          | Statistik nach Sportart                  |
-| `GET`   | `/api/analytics/athletes/:athleteId/performance-metrics`  | Leistungsmetriken                        |
-| `GET`   | `/api/analytics/athletes/:athleteId/average-heart-rate`   | Durchschnittliche Herzfrequenz           |
-| `GET`   | `/api/analytics/athletes/:athleteId/history`              | Trainingshistorie (klassisch)            |
-| `GET`   | `/api/analytics/athletes/:athleteId/progress`             | Fortschrittsanalyse (Metric-Trend)       |
-| `GET`   | `/api/analytics/sessions/:sessionId/summary`              | Session-Zusammenfassung                  |
-| `GET`   | `/api/analytics/sessions/:sessionId/detailed`             | Detailanalyse (Zeitreihe, GPS, HR-Zonen) |
-| `GET`   | `/api/analytics/sessions/:sessionId/hr-zones`             | Herzfrequenz-Zonen-Analyse               |
-| `GET`   | `/api/analytics/leaderboard`                              | Bestenliste (nach Sport/Metrik)          |
-| `GET`   | `/api/analytics/compare-training-levels`                  | Vergleich nach Trainingslevel            |
-| `GET`   | `/api/analytics/sessions-with-notes`                      | Sessions mit Notizen                     |
-| `POST`  | `/api/analytics/compare-athletes`                         | Mehrsportler-Vergleich                   |
-| `POST`  | `/api/analytics/compare-sessions`                         | Vergleich mehrerer Sessions              |
-| `POST`  | `/api/analytics/live-overview`                            | Echtzeit-Übersicht mehrerer Athleten     |
-| `POST`  | `/api/analytics/athletes/:athleteId/load-zones/calculate` | HR-Zonen-Berechnung                      |
+| Methode | Pfad                                                      | Beschreibung                                                     |
+|---------|-----------------------------------------------------------|------------------------------------------------------------------|
+| `GET`   | `/api/analytics/athletes/:athleteId/all-time-stats`       | Gesamtstatistik                                                  |
+| `GET`   | `/api/analytics/athletes/:athleteId/history-enhanced`     | Trainingshistorie mit Details                                    |
+| `GET`   | `/api/analytics/athletes/:athleteId/avg-per-session`      | Ø-Werte je Session                                               |
+| `GET`   | `/api/analytics/athletes/:athleteId/sport-stats`          | Statistik nach Sportart                                          |
+| `GET`   | `/api/analytics/athletes/:athleteId/performance-metrics`  | Leistungsmetriken                                                |
+| `GET`   | `/api/analytics/athletes/:athleteId/average-heart-rate`   | Durchschnittliche Herzfrequenz                                   |
+| `GET`   | `/api/analytics/athletes/:athleteId/history`              | Trainingshistorie (klassisch)                                    |
+| `GET`   | `/api/analytics/athletes/:athleteId/progress`             | Fortschrittsanalyse (Metric-Trend)                               |
+| `GET`   | `/api/analytics/sessions/:sessionId/summary`              | Session-Zusammenfassung                                          |
+| `GET`   | `/api/analytics/sessions/:sessionId/detailed`             | Detailanalyse (Zeitreihe, GPS, HR-Zonen)                         |
+| `GET`   | `/api/analytics/sessions/:sessionId/hr-zones`             | Herzfrequenz-Zonen-Analyse                                       |
+| `GET`   | `/api/analytics/leaderboard`                              | Bestenliste (nach Sport/Metrik)                                  |
+| `GET`   | `/api/analytics/compare-training-levels`                  | Vergleich nach Trainingslevel                                    |
+| `GET`   | `/api/analytics/sessions-with-notes`                      | Sessions mit Notizen                                             |
+| `POST`  | `/api/analytics/compare-athletes`                         | Mehrsportler-Vergleich (sport erforderlich)                      |
+| `POST`  | `/api/analytics/compare-sessions`                         | Vergleich mehrerer Sessions (gleiche Sportart + status=finished) |
+| `POST`  | `/api/analytics/live-overview`                            | Echtzeit-Übersicht mehrerer Athleten                             |
+| `POST`  | `/api/analytics/athletes/:athleteId/load-zones/calculate` | HR-Zonen-Berechnung                                              |
 
-### Admin
+### Administration
 
-| Methode | Pfad                                      | Beschreibung                    |
-|---------|-------------------------------------------|---------------------------------|
-| `GET`   | `/api/admin/users`                        | Alle Nutzer                     |
-| `POST`  | `/api/admin/users`                        | Nutzer anlegen                  |
-| `PATCH` | `/api/admin/users/:userId/role`           | Nutzerrolle ändern              |
-| `GET`   | `/api/admin/sensor-catalog`               | Sensor-Katalog                  |
-| `POST`  | `/api/admin/sensor-types`                 | Sensortyp anlegen/aktualisieren |
-| `GET`   | `/api/admin/system-metrics`               | Systemmetriken                  |
-| `GET`   | `/api/admin/write-performance`            | Schreibleistung                 |
-| `GET`   | `/api/admin/audit-logs`                   | Audit-Logs                      |
-| `GET`   | `/api/admin/data-volume-by-sport`         | Datenvolumen nach Sportart      |
-| `GET`   | `/api/admin/trainer-assignments`          | Trainer-Sportler-Zuordnungen    |
-| `PATCH` | `/api/admin/trainers/:trainerId/athletes` | Zuordnung bearbeiten            |
+| Methode | Pfad                                      | Beschreibung                       |
+|---------|-------------------------------------------|------------------------------------|
+| `GET`   | `/api/admin/users`                        | Alle Nutzer (Admin only)           |
+| `POST`  | `/api/admin/users`                        | Nutzer anlegen (Admin only)        |
+| `PATCH` | `/api/admin/users/:userId/role`           | Nutzerrolle ändern (Admin only)    |
+| `GET`   | `/api/admin/sensor-catalog`               | Sensor-Katalog (öffentlich)        |
+| `POST`  | `/api/admin/sensor-types`                 | Sensortyp anlegen/aktualisieren    |
+| `GET`   | `/api/admin/system-metrics`               | Systemmetriken (Admin only)        |
+| `GET`   | `/api/admin/write-performance`            | Schreibleistung (Admin only)       |
+| `GET`   | `/api/admin/audit-logs`                   | Audit-Logs (Admin only)            |
+| `GET`   | `/api/admin/sensor-types`                 | Sensortyp-Statistiken (Admin only) |
+| `GET`   | `/api/admin/data-volume-by-sport`         | Datenvolumen nach Sportart         |
+| `GET`   | `/api/admin/trainer-assignments`          | Trainer-Sportler-Zuordnungen       |
+| `PATCH` | `/api/admin/trainers/:trainerId/athletes` | Zuordnung bearbeiten (Admin only)  |
 
 ---
 
@@ -281,14 +292,14 @@ Für direkte DB-Inspektion:
 
 Die folgenden Variablen können in `backend/sportapi/.env` gesetzt werden (alle optional, Defaults sind entwicklungstauglich):
 
-| Variable                          | Default                     | Beschreibung                                                |
-|-----------------------------------|-----------------------------|-------------------------------------------------------------|
-| `MONGODB_URI`                     | `mongodb://127.0.0.1:27017` | MongoDB-Verbindungsstring                                   |
-| `MONGODB_DB_NAME`                 | `sport_performance`         | Datenbankname                                               |
-| `USE_MONGODB_TIME_SERIES`         | `false`                     | Native Time-Series-Collection aktivieren (nur bei neuer DB) |
-| `SENSOR_EVENTS_RETENTION_SECONDS` | `0` (kein TTL)              | Automatisches Löschen alter Sensor-Events                   |
-| `AUDIT_LOG_RETENTION_SECONDS`     | `15552000` (180 Tage)       | TTL für Audit-Logs                                          |
-| `AUTH_PASSWORD_PEPPER`            | `dev-pepper`                | Pepper für Passwort-Hashing (SHA-256)                       |
+| Variable                          | Default                           | Beschreibung                                                           |
+|-----------------------------------|-----------------------------------|------------------------------------------------------------------------|
+| `MONGODB_URI`                     | `mongodb://127.0.0.1:27017`       | MongoDB-Verbindungsstring                                              |
+| `MONGODB_DB_NAME`                 | `sport_performance`               | Datenbankname                                                          |
+| `SENSOR_EVENTS_RETENTION_SECONDS` | `0` (kein TTL)                    | Automatisches Löschen alter Sensor-Events (in Sekunden)                |
+| `AUDIT_LOG_RETENTION_SECONDS`     | `15552000` (180 Tage)             | TTL für Audit-Logs (in Sekunden)                                       |
+| `AUTH_PASSWORD_PEPPER`            | `dev-pepper`                      | Pepper für Passwort-Hashing (SHA-256)                                  |
+| `AUTH_TOKEN_SECRET`               | `dev-auth-token-secret-change-me` | Secret für Bearer-Token-Signierung (MUSS in Produktion gesetzt werden) |
 
 ---
 
@@ -301,17 +312,20 @@ docker compose up -d
 ```
 
 **Backend: Port 3000 bereits belegt:**
-Prozess auf Port 3000 finden und beenden
-
+```powershell
+# Windows: Prozess auf Port 3000 beenden
+```
 
 **Frontend: API-Fehler 404 / CORS:**
-- Sicherstellen, dass das Backend läuft (`http://localhost:3000/api/health`)
+- Sicherstellen, dass das Backend läuft: `http://localhost:3000/api/health`
 - Sicherstellen, dass das Frontend via `npm run dev` läuft (Proxy aktiv), nicht via `npm run preview`
+- Falls Proxy nicht greift: manuell im Browser `http://localhost:3000/api/health` aufrufen (sollte `{"status":"ok"}` zurückgeben)
 
 **Seed schlägt fehl (Index-Konflikt):**
 - Passiert, wenn die DB bereits Daten aus einer früheren Version enthält
 - Lösung: `docker compose down -v && docker compose up -d`, dann erneut `npm run seed`
 
-**Time-Series-Collection Fehler beim Neustart:**
-- `USE_MONGODB_TIME_SERIES=true` funktioniert nur, wenn die Collection `sensor_events` noch **nicht** existiert
-- Bei bestehender Standard-Collection einfach auf `false` lassen — die Aggregation Pipelines funktionieren in beiden Fällen identisch
+**Bearer-Token ungültig / abgelaufen:**
+- Access-Token ist standardmäßig 7 Tage gültig (konfigurierbar in `auth.utils.ts`)
+- Logout und erneutes Login erzeugt einen neuen Token
+- In Produktion: `AUTH_TOKEN_SECRET` in `.env` setzen (nicht das Dev-Default verwenden)
