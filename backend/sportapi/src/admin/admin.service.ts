@@ -266,15 +266,13 @@ export class AdminService {
     };
   }
 
-  private escapeRegex(value: string): string {
-    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
 
   async upsertSensorType(body: any, user: RequestUser) {
     this.requireAdmin(user);
 
     const sensorType = ensureString(body.sensorType ?? body.type, 'sensorType');
     const displayName = body.displayName?.toString().trim() || sensorType;
+    const normalizedDisplayName = displayName.toLowerCase();
     const allowedGeneratorTypes = new Set(['heart-rate', 'gps', 'power', 'custom']);
     const rawGeneratorType = body.generatorType?.toString().trim();
     const generatorType = rawGeneratorType && rawGeneratorType.length > 0 ? rawGeneratorType : undefined;
@@ -285,7 +283,7 @@ export class AdminService {
 
     const displayNameConflict = await this.mongoService.getDb().collection('sensor_types').findOne({
       sensorType: { $ne: sensorType },
-      displayName: { $regex: `^${this.escapeRegex(displayName)}$`, $options: 'i' }
+      normalizedDisplayName
     });
     if (displayNameConflict) {
       throw new BadRequestException(`displayName is already used by sensorType '${displayNameConflict.sensorType}'`);
@@ -306,24 +304,32 @@ export class AdminService {
 
     const now = new Date();
 
-    await this.mongoService.getDb().collection('sensor_types').updateOne(
-      { sensorType },
-      {
-        $set: {
-          sensorType,
-          displayName,
-          unit: body.unit?.toString().trim() || null,
-          description: body.description?.toString().trim() || null,
-          generatorType: generatorType ?? null,
-          generatorConfig: generatorConfig ?? null,
-          updatedAt: now
+    try {
+      await this.mongoService.getDb().collection('sensor_types').updateOne(
+        { sensorType },
+        {
+          $set: {
+            sensorType,
+            displayName,
+            normalizedDisplayName,
+            unit: body.unit?.toString().trim() || null,
+            description: body.description?.toString().trim() || null,
+            generatorType: generatorType ?? null,
+            generatorConfig: generatorConfig ?? null,
+            updatedAt: now
+          },
+          $setOnInsert: {
+            createdAt: now
+          }
         },
-        $setOnInsert: {
-          createdAt: now
-        }
-      },
-      { upsert: true }
-    );
+        { upsert: true }
+      );
+    } catch (error: any) {
+      if (error?.code === 11000) {
+        throw new BadRequestException('displayName must be unique');
+      }
+      throw error;
+    }
 
     const result = await this.mongoService.getDb().collection('sensor_types').findOne({ sensorType }, { projection: { _id: 0 } });
     await this.writeAuditLog(user, 'admin.sensorTypes.upsert', {

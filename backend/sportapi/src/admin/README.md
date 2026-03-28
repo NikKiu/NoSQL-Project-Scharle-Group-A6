@@ -23,6 +23,5 @@
 ## Hinweise zu Payloads
 - `POST /users`: typischerweise `email`, `password`, `role`, optionale Profildaten
 - `PATCH /users/:userId/role`: erwartet `role`
-- `POST /sensor-types`: erwartet Sensor-Metadaten (z. B. `type`, `label`, Generator/Config)
+- `POST /sensor-types`: erwartet Sensor-Metadaten (z. B. `type`, `label`, Generator/Config); `displayName` muss eindeutig sein (case-insensitive)
 - `PATCH /trainers/:trainerId/athletes`: erwartet Zieloperation und/oder Sportlerliste
-

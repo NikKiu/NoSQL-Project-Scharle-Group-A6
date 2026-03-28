@@ -53,7 +53,15 @@ export class MongoService implements OnModuleInit, OnModuleDestroy {
       this.db.collection('sensor_events').createIndex({ athleteId: 1, timestamp: -1 }),
       this.db.collection('sensor_events').createIndex({ sessionId: 1, timestamp: -1 }),
       this.db.collection('sensor_events').createIndex({ sessionId: 1, sensorType: 1, timestamp: -1 }),
-      this.db.collection('sensor_types').createIndex({ sensorType: 1 }, { unique: true })
+      this.db.collection('sensor_types').createIndex({ sensorType: 1 }, { unique: true }),
+      this.db.collection('sensor_types').createIndex(
+        { normalizedDisplayName: 1 },
+        {
+          unique: true,
+          sparse: true,
+          name: 'sensor_types_normalizedDisplayName_unique'
+        }
+      )
     ]);
 
     await this.syncTtlIndex('sensor_events', sensorRetentionSeconds);
